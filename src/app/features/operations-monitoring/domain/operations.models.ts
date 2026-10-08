@@ -95,5 +95,7 @@ export function readingFreshness(reading: AnimalReading, now: string): Freshness
 }
 
 export function validDay(day: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(day) && new Date(`${day}T12:00:00Z`).toISOString().slice(0, 10) === day;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
+  const parsed = new Date(`${day}T12:00:00Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === day;
 }
