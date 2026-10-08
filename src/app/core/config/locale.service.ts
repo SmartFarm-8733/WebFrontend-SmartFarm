@@ -31,8 +31,10 @@ export class LocaleService {
       ? new Date(value.length === 10 ? `${value}T12:00:00-05:00` : value)
       : value;
     if (!Number.isFinite(date.getTime())) return this.text('No date', 'Sin fecha');
+    const defaults: Intl.DateTimeFormatOptions = options?.dateStyle || options?.timeStyle
+      ? {} : { month: 'short', day: 'numeric', year: 'numeric' };
     return new Intl.DateTimeFormat(this.locale().replace('_', '-'), {
-      timeZone: 'America/Lima', month: 'short', day: 'numeric', year: 'numeric', ...options,
+      timeZone: 'America/Lima', ...defaults, ...options,
     }).format(date);
   }
 
