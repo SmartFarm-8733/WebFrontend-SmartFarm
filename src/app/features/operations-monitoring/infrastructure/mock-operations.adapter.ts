@@ -5,14 +5,21 @@ import { AlertStatus, AnimalReading, CareRecordInput, CLINICAL_KINDS, EMPTY_OPER
 function seed(herdId: string): OperationsSnapshot {
   const pucara = herdId === 'pucara';
   const profiles = pucara
-    ? [{ id: 'ICH-118', name: 'Luna' }, { id: 'ICH-210', name: 'Inti' }]
-    : [{ id: 'ICH-014', name: 'Napoleón' }, { id: 'ICH-089', name: 'María' }, { id: 'ICH-118', name: 'Lucero' }, { id: 'ICH-201', name: 'Alba' }];
+    ? [
+      { id: 'ICH-118', name: 'Luna', lot: { en: 'Lot 03 · pasture', es: 'Lote 03 · pastoreo' } },
+      { id: 'ICH-210', name: 'Inti', lot: { en: 'Lot 01 · pasture', es: 'Lote 01 · pastoreo' } },
+    ]
+    : [
+      { id: 'ICH-014', name: 'Napoleón', lot: { en: 'Breeding · Lot 03', es: 'Reproductores · Lote 03' } },
+      { id: 'ICH-089', name: 'María', lot: { en: 'Lot 03 · pasture', es: 'Lote 03 · pastoreo' } },
+      { id: 'ICH-118', name: 'Lucero', lot: { en: 'Lot 03 · pasture', es: 'Lote 03 · pastoreo' } },
+      { id: 'ICH-201', name: 'Alba', lot: { en: 'Lot 01 · pasture', es: 'Lote 01 · pastoreo' } },
+    ];
   const ids = profiles.map((animal) => animal.id);
   const clinicalAnimalId = ids[pucara ? 0 : 2];
   const fieldAnimalId = ids[pucara ? 1 : 3];
-  const animals: AnimalReading[] = profiles.map(({ id, name }, index) => ({
-    id, herdId, name,
-    lot: index === 0 ? { en: 'Breeding lot', es: 'Lote reproductores' } : { en: 'Lot 05 · pasture', es: 'Lote 05 · pastoreo' },
+  const animals: AnimalReading[] = profiles.map(({ id, name, lot }, index) => ({
+    id, herdId, name, lot,
     temperature: [40.3, 38.8, 38.4, null][index], rumination: [290, 240, 410, null][index], activity: [24, 12, 48, null][index],
     capturedAt: index === 3 ? null : index === 1 ? '2026-10-08T08:10:00-05:00' : '2026-10-08T10:20:00-05:00',
     syncedAt: index === 3 ? null : '2026-10-08T10:25:00-05:00', connected: index !== 1 && index !== 3,
@@ -33,8 +40,8 @@ function seed(herdId: string): OperationsSnapshot {
       { id: `${herdId}-service`, herdId, animalId: clinicalAnimalId, kind: 'service', occurredAt: '2026-09-17T08:30:00-05:00', note: { en: 'Service entered by demo veterinarian. Pregnancy assessment pending.', es: 'Servicio registrado por veterinario de muestra. Evaluación de gestación pendiente.' }, author: 'MVZ D. Carbajal · demo', product: '', dose: '', withdrawalStart: null, withdrawalEnd: null, withdrawalTarget: null },
     ],
     lots: [
-      { id: `${herdId}-05`, herdId, name: { en: 'Lot 05 · finishing', es: 'Lote 05 · engorde' }, animals: pucara ? 18 : 24, pastureTonnes: pucara ? 12 : 18, pastureCapacity: 25, waterPercent: 84, waterTemperature: 18.2, heater: 'off', capturedAt: '2026-10-08T10:15:00-05:00', syncedAt: '2026-10-08T10:25:00-05:00', expectedWeight: 430, estimatedWeight: 438, cycleDay: 74, cycleDays: 90 },
-      { id: `${herdId}-02`, herdId, name: { en: 'Lot 02 · pasture', es: 'Lote 02 · pastoreo' }, animals: pucara ? 12 : 16, pastureTonnes: 6, pastureCapacity: 15, waterPercent: 18, waterTemperature: null, heater: 'unknown', capturedAt: '2026-10-08T07:30:00-05:00', syncedAt: '2026-10-08T10:25:00-05:00', expectedWeight: 395, estimatedWeight: 391, cycleDay: 52, cycleDays: 90 },
+      { id: `${herdId}-03`, herdId, name: { en: 'Lot 03', es: 'Lote 03' }, animals: pucara ? 1 : 5, pastureTonnes: pucara ? 12 : 18, pastureCapacity: 25, waterPercent: 84, waterTemperature: 18.2, heater: 'off', capturedAt: '2026-10-08T10:15:00-05:00', syncedAt: '2026-10-08T10:25:00-05:00', expectedWeight: 430, estimatedWeight: 438, cycleDay: 74, cycleDays: 90 },
+      { id: `${herdId}-01`, herdId, name: { en: 'Lot 01', es: 'Lote 01' }, animals: pucara ? 1 : 2, pastureTonnes: 6, pastureCapacity: 15, waterPercent: 18, waterTemperature: null, heater: 'unknown', capturedAt: '2026-10-08T07:30:00-05:00', syncedAt: '2026-10-08T10:25:00-05:00', expectedWeight: 395, estimatedWeight: 391, cycleDay: 52, cycleDays: 90 },
     ],
   };
 }
@@ -86,7 +93,7 @@ export class MockOperationsAdapter extends OperationsRepository {
   }
 
   private authorized(herdId: string, role: HerdRole): boolean {
-    return ['rancher', 'veterinarian'].includes(role) && ['esperanza', 'pucara'].includes(herdId);
+    return role === 'rancher' ? herdId === 'esperanza' || herdId === 'pucara' : role === 'veterinarian' && herdId === 'esperanza';
   }
 
   private publish(herdId: string, data: OperationsSnapshot): void {
