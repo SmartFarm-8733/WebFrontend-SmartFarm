@@ -51,7 +51,10 @@
             <div class="field">
               <label for="profile-license">{{ locale.text('Demo license number', 'Colegiatura de prueba') }}</label>
               <input id="profile-license" formControlName="license" type="text" maxlength="11" [attr.aria-invalid]="(form.controls.license.touched && form.controls.license.invalid) || status() === 'duplicate-license'" aria-describedby="profile-license-error">
-              <p class="form-error" id="profile-license-error">@if (form.controls.license.touched && form.controls.license.invalid) { {{ locale.text('Use CMVP- followed by 4–6 digits.', 'Usa CMVP- seguido de 4 a 6 dígitos.') }} @if (status() === 'duplicate-license') { {{ locale.text('That license belongs to another sample profile.', 'Esa colegiatura pertenece a otro perfil de ejemplo.') }} }</p>
+              <p class="form-error" id="profile-license-error">
+                @if (form.controls.license.touched && form.controls.license.invalid) { {{ locale.text('Use CMVP- followed by 4–6 digits.', 'Usa CMVP- seguido de 4 a 6 dígitos.') }} }
+                @if (status() === 'duplicate-license') { {{ locale.text('That license belongs to another sample profile.', 'Esa colegiatura pertenece a otro perfil de ejemplo.') }} }
+              </p>
             </div>
             <div class="field">
               <label for="profile-experience">{{ locale.text('Years of experience', 'Años de experiencia') }}</label>
@@ -85,4 +88,3 @@
     </div>
   </aside>
 </div>
-
