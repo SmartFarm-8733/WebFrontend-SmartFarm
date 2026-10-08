@@ -19,7 +19,7 @@
 .donut span { display: grid; place-items: center; background: white; width: 74px; height: 74px; border-radius: 50%; font: 600 1.4rem var(--font-heading); color: var(--forest); }
 .coverage-foot { padding: 12px 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: .625rem; }
 .campaign-list { padding: 4px 20px; } .campaign-row { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); } .campaign-row:last-child { border: 0; }
-.campaign-date { width: 52px; flex-shrink: 0; font: 600 .875rem var(--font-heading); color: var(--accent); }
+.campaign-date { width: 52px; flex-shrink: 0; font: 600 .875rem var(--font-heading); color: #795b24; }
 .campaign-row > div { flex: 1; } progress { width: 100%; height: 6px; accent-color: var(--forest); margin-top: 8px; }
 .herd-photo { margin: 0; position: relative; overflow: hidden; height: 230px; border-radius: 12px; }
 .herd-photo img { width: 100%; height: 100%; object-fit: cover; } .herd-photo::after { content: ''; position: absolute; inset: 30% 0 0; background: linear-gradient(transparent, rgb(25 43 31 / .85)); }
