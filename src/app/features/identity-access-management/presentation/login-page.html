@@ -1,0 +1,53 @@
+<section class="auth-layout login-layout" aria-labelledby="login-title">
+  <div class="auth-content">
+    <img class="brand" src="/assets/images/ICHU_Principal_Transparente.png" [alt]="locale.text('ICHU · SmartFarm', 'ICHU · SmartFarm')" width="82" height="96">
+    <span class="eyebrow">{{ locale.text('Field care, connected', 'Cuidado de campo, conectado') }}</span>
+    <h1 id="login-title">{{ locale.text('Welcome to ICHU', 'Bienvenido a ICHU') }}</h1>
+    <p class="page-lead">{{ locale.text('Follow your herd. Work closer to your veterinary team.', 'Sigue a tu hato. Trabaja más cerca de tu equipo veterinario.') }}</p>
+    <div class="notice" id="login-demo-note">{{ locale.text('TB1 demo · Sample data only. No credentials needed.', 'Demo TB1 · Solo datos de ejemplo. No necesitas credenciales.') }}</div>
+    <div class="field">
+      <label for="login-role">{{ locale.text('Explore as', 'Explorar como') }}</label>
+      <select id="login-role" [formControl]="role" aria-describedby="login-demo-note">
+        <option value="rancher">{{ locale.text('Rancher', 'Ganadero') }}</option>
+        <option value="veterinarian">{{ locale.text('Veterinarian', 'Veterinario') }}</option>
+      </select>
+    </div>
+    <button mat-flat-button class="btn gold full-width" type="button" [disabled]="entering()" (click)="exploreDemo()">
+      {{ entering() ? locale.text('Opening demo…', 'Abriendo demo…') : locale.text('Explore demo', 'Explorar demo') }}
+    </button>
+    <details class="credential-demo">
+      <summary>{{ locale.text('Try the sign-in form', 'Probar el formulario de acceso') }}</summary>
+      <p id="credential-note" class="text-muted">{{ locale.text('This checks format only and opens the same demo. Your password is cleared and never saved.', 'Solo revisa el formato y abre la misma demo. Tu contraseña se borra y nunca se guarda.') }}</p>
+      <form class="stack" [formGroup]="credentials" (ngSubmit)="checkDemoForm()" novalidate aria-describedby="credential-note">
+        <div class="field">
+          <label for="login-email">{{ locale.text('Email', 'Correo') }}</label>
+          <input id="login-email" type="email" formControlName="email" autocomplete="email" maxlength="120"
+            [attr.aria-invalid]="credentials.controls.email.touched && credentials.controls.email.invalid" aria-describedby="login-email-error">
+          <p class="form-error" id="login-email-error">@if (credentials.controls.email.touched && credentials.controls.email.invalid) { {{ locale.text('Enter a valid email.', 'Ingresa un correo válido.') }} }</p>
+        </div>
+        <div class="field">
+          <label for="login-password">{{ locale.text('Demo password', 'Contraseña de prueba') }}</label>
+          <input id="login-password" type="password" formControlName="password" autocomplete="off" minlength="8" maxlength="128"
+            [attr.aria-invalid]="credentials.controls.password.touched && credentials.controls.password.invalid" aria-describedby="login-password-error">
+          <p class="form-error" id="login-password-error">@if (credentials.controls.password.touched && credentials.controls.password.invalid) { {{ locale.text('Use 8–128 characters for this format check.', 'Usa entre 8 y 128 caracteres para revisar el formato.') }} }</p>
+        </div>
+        <button mat-flat-button type="submit" class="btn primary" [disabled]="entering()">{{ locale.text('Check format and explore', 'Revisar formato y explorar') }}</button>
+      </form>
+    </details>
+    @if (navigationFailed()) {
+      <p class="form-error" role="alert">{{ locale.text('The demo destination could not open. Try Explore demo again.', 'No se pudo abrir el destino. Intenta explorar la demo otra vez.') }}</p>
+    }
+    <nav class="auth-links" [attr.aria-label]="locale.text('Account options', 'Opciones de cuenta')">
+      <a routerLink="/register">{{ locale.text('Create a demo profile', 'Crear un perfil de prueba') }}</a>
+      <a routerLink="/recover">{{ locale.text('Forgot your password?', '¿Olvidaste tu contraseña?') }}</a>
+    </nav>
+  </div>
+  <figure class="auth-photo">
+    <img src="/assets/images/ichu-hato-real.png" [alt]="locale.text('Cattle grazing at a farm in the Peruvian highlands', 'Hato en un fundo de la sierra peruana')" fetchpriority="high">
+    <figcaption>
+      <span>{{ locale.text('FROM THE FIELD TO THE DECISION', 'DEL POTRERO A LA DECISIÓN') }}</span>
+      <strong>{{ locale.text('Every animal has a story to care for.', 'Cada animal, una historia que cuidar.') }}</strong>
+      <p>{{ locale.text('Bring field work and veterinary follow-up together.', 'Conecta el trabajo de campo con el seguimiento veterinario.') }}</p>
+    </figcaption>
+  </figure>
+</section>
