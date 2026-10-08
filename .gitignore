@@ -1,0 +1,21 @@
+# Dependencies and generated output
+/node_modules/
+/dist/
+/out-tsc/
+/.angular/
+/coverage/
+/output/
+/tmp/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+
+# Editor-specific files
+/.idea/
+/.vscode/
