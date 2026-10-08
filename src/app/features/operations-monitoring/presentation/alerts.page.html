@@ -89,7 +89,7 @@
               <div class="response-record">
                 <strong>{{ locale.text('Recorded response', 'Respuesta registrada') }}</strong>
                 <p>{{ alert.responseNote }}</p>
-                <span class="text-muted">{{ facade.author(alert.author) }}@if (alert.acknowledgedAt) { · {{ locale.text('Acknowledged', 'Atendida') }} {{ facade.captured(alert.acknowledgedAt) }} }@if (alert.resolvedAt) { · {{ locale.text('Resolved', 'Resuelta') }} {{ facade.captured(alert.resolvedAt) }}</span>
+                <span class="text-muted">{{ facade.author(alert.author) }}@if (alert.acknowledgedAt) { · {{ locale.text('Acknowledged', 'Atendida') }} {{ facade.captured(alert.acknowledgedAt) }} }@if (alert.resolvedAt) { · {{ locale.text('Resolved', 'Resuelta') }} {{ facade.captured(alert.resolvedAt) }} }</span>
               </div>
             }
 
