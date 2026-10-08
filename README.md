@@ -1,94 +1,81 @@
-# SmartFarm Web Frontend
+# ICHU · SmartFarm Web
 
-Initial Angular structure for **ICHU**, the livestock management product of SmartFarm.
+Angular frontend for livestock management, based on the SmartFarm report and the supplied ICHU mockups.
 
-This repository currently contains project configuration and architecture placeholders only. The application starts with a blank page by design. There are no business features, authentication flows, mock services, API connections, payment operations or device integrations.
-
-## Technology baseline
-
-- Angular 22.2.2 and TypeScript 6.0.3.
-- Angular Material and CDK 22.2.2, installed but not yet themed or used.
-- HTML and SCSS.
-- Standalone application bootstrap and empty router configuration.
-- Node.js 24.19.0 is the reference environment; compatible alternatives are listed in `package.json`.
-
-Dependencies are pinned, and `package-lock.json` must remain versioned.
-
-## Run locally
+## Run
 
 ```sh
 npm ci
 npm start
 ```
 
-Open http://localhost:4200. An empty page is the expected result at this stage.
+Default Angular development URL: http://localhost:4200.
 
-## Verify the scaffold
+On Windows machines where Application Control blocks the native build parser, use the optional Angular Webpack compatibility target:
 
 ```sh
-npm run build
+npm run start:compat
 ```
 
-The build output is generated in `dist/smartfarm-web/` and is not versioned. A production build validates the scaffold; it does not replace a test suite. No test runner or application tests have been introduced yet.
+Do not disable operating-system security. The compatibility builder is deprecated upstream and is a temporary local fallback; the default build remains Angular's current application builder.
 
-## Project structure
+## Verify
+
+```sh
+npm run typecheck
+npm run build
+npm run test:e2e
+```
+
+For local Windows verification:
+
+```powershell
+npm run build:compat
+$env:PLAYWRIGHT_CHANNEL = 'msedge'
+npm run test:e2e
+```
+
+Browser tests require a local Chromium browser or Microsoft Edge. CI installs Chromium. Preview a compiled build with `npm run preview` or `npm run preview:compat` at http://127.0.0.1:4180.
+
+## Stack and architecture
+
+- Angular 22.2.2, standalone components, signals and zoneless change detection.
+- Angular Material/CDK and SCSS design tokens.
+- Outfit and Plus Jakarta Sans, self-hosted from Fontsource packages.
+- TypeScript 6.0.3; reference Node.js 24.19.0.
+- Seven domain-aligned frontend features, each with domain, application, infrastructure and presentation layers.
 
 ```text
-public/
-  assets/
-    fonts/
-    icons/
-    images/
-  i18n/
-docs/
-  architecture.md
-src/
-  app/
-    core/
-      config/
-      layout/
-    shared/
-      domain/
-      presentation/
-    features/
-      identity-access-management/
-      cattle-information/
-      iot-assets/
-      operations-monitoring/
-      planning/
-      dashboard-analytics/
-      subscription-plans/
-    app.ts
-    app.html
-    app.config.ts
-    app.routes.ts
-  environments/
-  styles/
-    themes/
-    tokens/
-  index.html
-  main.ts
-  styles.scss
-tests/
-  e2e/
+src/app/
+  core/
+    config/       # Language, demo workspace and composition
+    layout/       # Responsive shared shell
+  shared/
+    domain/       # Minimal shared contracts
+    presentation/ # Neutral UI components
+  features/
+    identity-access-management/
+    cattle-information/
+    iot-assets/
+    operations-monitoring/
+    planning/
+    dashboard-analytics/
+    subscription-plans/
+src/styles/tokens/
+public/assets/images/
+tests/e2e/
 ```
 
-Each feature has `domain/`, `application/`, `infrastructure/` and `presentation/` folders. Empty folders contain `.gitkeep` so Git can retain the agreed structure.
+[Architecture and business boundaries](docs/architecture.md). Empty directories retain `.gitkeep` until implementation fills them.
 
-See [Architecture](docs/architecture.md) for responsibilities and dependency boundaries.
+## TB1 boundaries
 
-## Delivery boundaries
+The frontend uses fictional, in-memory demonstration records. Reloading resets those records; only language preference is persisted. It does not authenticate users, charge payments, deliver messages, operate hardware or supply a veterinary diagnosis. Do not enter sensitive information.
 
-For TB1, the frontend will be implemented and deployed independently of the backend. Future simulated-data adapters must be distinguishable from real integrations. The structure does not imply that any user story is already implemented.
-
-The landing page, mobile application, .NET backend, databases and embedded applications are separate products and do not belong in this repository.
+The demo starts in English (`en_US`) and supports Spanish (`es_419`). The mobile application, public landing page, edge software and .NET API are separate containers.
 
 ## Collaboration
 
-Use short-lived `feature/<kebab-case-name>` branches from `develop`, Conventional Commits and pull requests for integration. `main` is the stable delivery branch. Do not commit generated output, credentials or dependencies.
+Create short-lived `feature/<kebab-case-name>` branches from `main`; integrate shared foundations before dependent modules. Use English Conventional Commits, one changed file per commit as agreed for this implementation, and pull requests to `main`. Integration merge commits are separate from file-level implementation commits.
 
-Suggested initial commit:
-
-```text
-chore: initialize Angular frontend structure with DDD boundaries
-```
+Do not commit dependencies, generated builds, test output, credentials or tokens. Keep the lockfile versioned. GitHub Actions checks types, production compilation and browser behavior.
