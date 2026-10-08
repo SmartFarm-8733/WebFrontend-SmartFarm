@@ -67,8 +67,8 @@ function seedDevices(): IoTDevice[] {
       capturedAt: '2026-10-08T10:27:00-05:00', lastSeen: '2026-10-08T10:27:10-05:00',
       firmware: '1.8.2', pendingReadings: 0, location: { en: 'Main pasture', es: 'Potrero principal' }, bufferedReadings: 216,
     },
-    collar('CL-0301', 'pucara-luna', 53, 'online', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
-    collar('CL-0210', 'pucara-inti', 53, 'offline', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
+    collar('CL-0210', 'pucara-luna', 53, 'online', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
+    collar('CL-0301', null, 53, 'offline', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
     collar('CL-0302', null, null, 'never-seen', null, null, null, 0, 'pucara'),
     {
       id: 'WT-0002', herdId: 'pucara', type: 'water-controller', connection: 'never-seen', battery: null,

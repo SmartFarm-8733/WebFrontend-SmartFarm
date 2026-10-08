@@ -26,6 +26,7 @@ test('assignments reference known active animals in the same herd', () => {
 });
 
 test('collar serials are unique and assignments retain canonical animal labels', () => {
+  const deviceById = new Map(DEMO_DEVICE_FIXTURES.map((device) => [device.id, device]));
   const assignmentByDeviceId = new Map(
     DEMO_DEVICE_FIXTURES
       .filter((device) => device.type === 'collar' && device.assignment !== null)
@@ -33,8 +34,11 @@ test('collar serials are unique and assignments retain canonical animal labels',
   );
 
   expect(assignmentByDeviceId.get('CL-0118')).toMatchObject({ id: 'lucero', earTag: 'ICH-118', name: 'Lucero' });
-  expect(assignmentByDeviceId.get('CL-0301')).toMatchObject({ id: 'pucara-luna', earTag: 'ICH-118', name: 'Luna' });
-  expect(assignmentByDeviceId.get('CL-0210')).toMatchObject({ id: 'pucara-inti', earTag: 'ICH-210', name: 'Inti' });
+  expect(assignmentByDeviceId.get('CL-0210')).toMatchObject({ id: 'pucara-luna', earTag: 'ICH-118', name: 'Luna' });
+  expect(deviceById.get('CL-0301')).toMatchObject({ herdId: 'pucara', type: 'collar', connection: 'offline', assignment: null });
+  expect(assignmentByDeviceId.has('CL-0301')).toBe(false);
+  expect(DEMO_ANIMALS).toContainEqual({ id: 'pucara-inti', herdId: 'pucara', earTag: 'ICH-210', name: 'Inti' });
+  expect([...assignmentByDeviceId.values()].some((animal) => animal?.id === 'pucara-inti')).toBe(false);
 });
 
 test('assigned collar fixtures stay within the demo plan cap per herd', () => {
