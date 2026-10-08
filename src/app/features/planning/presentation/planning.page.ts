@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, ValidatorFn } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { MatButtonModule } from '@angular/material/button';
-import { RouterLink, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { LocaleService } from '../../../core/config/locale.service';
 import { PlanningFacade } from '../application/planning.facade';
 import { CampaignType, DisplayStatus, HealthCampaign, LocalizedName, PlanningError, dateValue, shiftDate, withdrawalOverlaps } from '../domain/planning.models';
@@ -10,7 +9,7 @@ import { PlanningRepository } from '../domain/planning.repository';
 import { MockPlanningAdapter } from '../infrastructure/mock-planning.adapter';
 
 @Component({
-  selector: 'ichu-planning-page', standalone: true, imports: [ReactiveFormsModule, MatButtonModule, RouterLink],
+  selector: 'ichu-planning-page', standalone: true, imports: [ReactiveFormsModule],
   templateUrl: './planning.page.html', styleUrl: './planning.page.scss', changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [PlanningFacade, { provide: PlanningRepository, useExisting: MockPlanningAdapter }],
 })
