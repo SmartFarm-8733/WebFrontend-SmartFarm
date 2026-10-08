@@ -118,14 +118,15 @@ export class RegisterPage {
 })
 export class RecoveryPage {
   readonly locale = inject(LocaleService);
-  readonly email = new FormControl('', { nonNullable: true, validators: [
-    Validators.required, Validators.email, Validators.maxLength(120),
-  ] });
+  readonly form = new FormGroup({
+    email: new FormControl('', { nonNullable: true, validators: [
+      Validators.required, Validators.email, Validators.maxLength(120),
+    ] }),
+  });
   readonly instructionsVisible = signal(false);
 
   showInstructions(): void {
-    this.email.markAsTouched();
-    if (this.email.valid) this.instructionsVisible.set(true);
+    this.form.markAllAsTouched();
+    if (this.form.controls.email.valid) this.instructionsVisible.set(true);
   }
 }
-
