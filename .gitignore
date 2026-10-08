@@ -4,6 +4,8 @@
 /out-tsc/
 /.angular/
 /coverage/
+/playwright-report/
+/test-results/
 /output/
 /tmp/
 
