@@ -1,0 +1,126 @@
+<div class="stack cattle-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">{{ workspace.herdName() }}</p>
+      <h1>{{ locale.text('My herd', 'Mi hato') }}</h1>
+      <p class="page-lead">{{ locale.text('Every animal, one lasting record.', 'Cada animal, una ficha que permanece.') }}</p>
+    </div>
+    @if (facade.writable()) {
+      <button mat-flat-button class="btn gold" type="button" (click)="toggleRegistration()"
+        [attr.aria-expanded]="registrationOpen()" aria-controls="register-animal">
+        {{ registrationOpen() ? locale.text('Close registration', 'Cerrar registro') : locale.text('Register animal', 'Registrar animal') }}
+      </button>
+    }
+  </header>
+
+  <p class="demo-note">{{ locale.text('TB1 demo · Sample animals. Changes last until this page is reloaded.', 'Demo TB1 · Animales de ejemplo. Los cambios duran hasta recargar la página.') }}</p>
+  @if (!facade.writable()) {
+    <p class="notice" role="status">{{ locale.text('Veterinary view · Read only. The rancher manages registrations, stages and exits.', 'Vista veterinaria · Solo lectura. El ganadero gestiona registros, etapas y bajas.') }}</p>
+  }
+  @if (registeredId(); as id) {
+    <p class="notice" role="status">{{ locale.text('Animal registered in this herd.', 'Animal registrado en este hato.') }}
+      <a [routerLink]="['/cattle', id]">{{ locale.text('Open record', 'Abrir ficha') }}</a>
+    </p>
+  }
+
+  @if (registrationOpen() && facade.writable()) {
+    <section class="panel registration" id="register-animal" aria-labelledby="registration-title">
+      <div class="panel-head"><h2 id="registration-title">{{ locale.text('Register animal', 'Registrar animal') }}</h2></div>
+      <div class="panel-body">
+        <p class="text-muted">{{ locale.text('The tag must be unique in this herd. A collar can be assigned later.', 'El arete debe ser único en este hato. El collar se puede asignar después.') }}</p>
+        <form [formGroup]="registrationForm" (ngSubmit)="register()" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="animal-tag">{{ locale.text('Ear tag', 'Arete') }}</label>
+              <input id="animal-tag" formControlName="tag" required maxlength="20" placeholder="ICH-202" autocomplete="off"
+                [attr.aria-invalid]="invalid('tag')" aria-describedby="tag-help">
+              <span id="tag-help" [class.form-error]="invalid('tag')">{{ locale.text('3–20 letters, numbers or hyphens.', '3–20 letras, números o guiones.') }}</span>
+            </div>
+            <div class="field">
+              <label for="animal-name">{{ locale.text('Name', 'Nombre') }}</label>
+              <input id="animal-name" formControlName="name" required minlength="2" maxlength="60" autocomplete="off"
+                [attr.aria-invalid]="invalid('name')" aria-describedby="name-help">
+              <span id="name-help" [class.form-error]="invalid('name')">{{ locale.text('2–60 characters.', '2–60 caracteres.') }}</span>
+            </div>
+            <div class="field">
+              <label for="animal-breed">{{ locale.text('Breed', 'Raza') }}</label>
+              <input id="animal-breed" formControlName="breed" required minlength="2" maxlength="60"
+                [attr.aria-invalid]="invalid('breed')" aria-describedby="breed-help">
+              <span id="breed-help" [class.form-error]="invalid('breed')">{{ locale.text('2–60 characters.', '2–60 caracteres.') }}</span>
+            </div>
+            <div class="field">
+              <label for="animal-sex">{{ locale.text('Sex', 'Sexo') }}</label>
+              <select id="animal-sex" formControlName="sex"><option value="female">{{ locale.text('Female', 'Hembra') }}</option><option value="male">{{ locale.text('Male', 'Macho') }}</option></select>
+            </div>
+            <div class="field">
+              <label for="animal-stage">{{ locale.text('Life stage', 'Etapa productiva') }}</label>
+              <select id="animal-stage" formControlName="stage" [attr.aria-invalid]="!stageCompatible()" aria-describedby="stage-help">
+                @for (stage of stages(); track stage) { <option [value]="stage">{{ facade.stageLabel(stage) }}</option> }
+              </select>
+              @if (!stageCompatible()) { <span id="stage-help" class="form-error">{{ locale.text('Choose a stage that matches the sex.', 'Elige una etapa compatible con el sexo.') }}</span> }
+            </div>
+            <div class="field">
+              <label for="animal-lot">{{ locale.text('Lot · paddock', 'Lote · potrero') }}</label>
+              <select id="animal-lot" formControlName="lot">@for (lot of facade.lots; track lot) { <option [value]="lot">{{ facade.lotLabel(lot) }}</option> }</select>
+            </div>
+            <div class="field">
+              <label for="animal-birth">{{ locale.text('Date of birth', 'Fecha de nacimiento') }}</label>
+              <input id="animal-birth" type="date" formControlName="birthDate" required [max]="today" [attr.aria-invalid]="invalid('birthDate')" aria-describedby="birth-help">
+              <span id="birth-help" [class.form-error]="invalid('birthDate')">{{ locale.text('Use a valid date up to today.', 'Usa una fecha válida hasta hoy.') }}</span>
+            </div>
+          </div>
+          @if (facade.error()) {
+            <p class="form-error" role="alert">{{ facade.error() }}
+              @if (facade.existingId(); as id) { <a [routerLink]="['/cattle', id]">{{ locale.text('View existing animal', 'Ver animal existente') }}</a> }
+            </p>
+          }
+          <div class="form-actions">
+            <button mat-flat-button class="btn primary" type="submit">{{ locale.text('Save animal', 'Guardar animal') }}</button>
+            <button mat-button class="btn secondary" type="button" (click)="toggleRegistration()">{{ locale.text('Cancel', 'Cancelar') }}</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  }
+
+  <div class="stats-grid" [attr.aria-label]="locale.text('Herd summary', 'Resumen del hato')">
+    <div class="stat featured"><span class="stat-label">{{ locale.text('Active animals', 'Animales activos') }}</span><strong class="stat-value">{{ locale.number(facade.stats().active) }}</strong><span class="stat-note">{{ locale.text('In the selected herd', 'En el hato seleccionado') }}</span></div>
+    <div class="stat"><span class="stat-label">{{ locale.text('Connected collars', 'Collares conectados') }}</span><strong class="stat-value">{{ locale.number(facade.stats().connected) }}</strong><span class="stat-note">{{ locale.text('Sample connection state', 'Estado de conexión de ejemplo') }}</span></div>
+    <div class="stat"><span class="stat-label">{{ locale.text('Under observation', 'En observación') }}</span><strong class="stat-value">{{ locale.number(facade.stats().observation) }}</strong><span class="stat-note">{{ locale.text('Review in health records', 'Revisar en historial sanitario') }}</span></div>
+    <div class="stat"><span class="stat-label">{{ locale.text('Recorded exits', 'Bajas registradas') }}</span><strong class="stat-value">{{ locale.number(facade.stats().inactive) }}</strong><span class="stat-note">{{ locale.text('History preserved', 'Historial conservado') }}</span></div>
+  </div>
+
+  <section class="panel inventory" aria-labelledby="inventory-title">
+    <div class="panel-head"><h2 id="inventory-title">{{ locale.text('Animal inventory', 'Inventario por animal') }}</h2><span class="text-muted">{{ locale.number(filtered().length) }} {{ locale.text('records', 'fichas') }}</span></div>
+    <form class="toolbar inventory-filters" [formGroup]="filtersForm" (submit)="$event.preventDefault()">
+      <div class="field search-field"><label for="cattle-search">{{ locale.text('Search', 'Buscar') }}</label><input id="cattle-search" type="search" formControlName="search" [placeholder]="locale.text('Ear tag or name', 'Arete o nombre')" autocomplete="off"></div>
+      <div class="field"><label for="cattle-lot">{{ locale.text('Lot', 'Lote') }}</label><select id="cattle-lot" formControlName="lot"><option value="">{{ locale.text('All lots', 'Todos los lotes') }}</option>@for (lot of facade.lots; track lot) { <option [value]="lot">{{ facade.lotLabel(lot) }}</option> }</select></div>
+      <div class="field"><label for="cattle-stage">{{ locale.text('Stage', 'Etapa') }}</label><select id="cattle-stage" formControlName="stage"><option value="">{{ locale.text('All stages', 'Todas las etapas') }}</option>@for (stage of facade.stages; track stage) { <option [value]="stage">{{ facade.stageLabel(stage) }}</option> }</select></div>
+      <div class="field"><label for="cattle-status">{{ locale.text('Status', 'Estado') }}</label><select id="cattle-status" formControlName="status"><option value="">{{ locale.text('All records', 'Todas las fichas') }}</option><option value="active">{{ locale.text('Active', 'Activos') }}</option><option value="observation">{{ locale.text('Observation', 'Observación') }}</option><option value="inactive">{{ locale.text('Inactive', 'Inactivos') }}</option></select></div>
+      <button mat-button class="btn secondary" type="button" (click)="resetFilters()">{{ locale.text('Reset', 'Restablecer') }}</button>
+    </form>
+    @if (visible().length) {
+      <div class="table-scroll" tabindex="0" role="region" [attr.aria-label]="locale.text('Animal inventory table', 'Tabla de inventario animal')">
+        <table class="data-table">
+          <caption class="visually-hidden">{{ locale.text('Animals in the selected herd. Open the tag to view a record.', 'Animales del hato seleccionado. Abre el arete para ver su ficha.') }}</caption>
+          <thead><tr><th scope="col">{{ locale.text('Ear tag', 'Arete') }}</th><th scope="col">{{ locale.text('Name · breed', 'Nombre · raza') }}</th><th scope="col">{{ locale.text('Stage', 'Etapa') }}</th><th scope="col">{{ locale.text('Lot · paddock', 'Lote · potrero') }}</th><th scope="col">{{ locale.text('Collar', 'Collar') }}</th><th scope="col">{{ locale.text('Status', 'Estado') }}</th></tr></thead>
+          <tbody>@for (animal of visible(); track animal.id) {
+            <tr [class.inactive-row]="animal.status === 'inactive'">
+              <th scope="row"><a class="animal-link mono" [routerLink]="['/cattle', animal.id]" [attr.aria-label]="locale.text('Open record for ', 'Abrir ficha de ') + animal.tag + ' ' + animal.name">{{ animal.tag }} <span aria-hidden="true">↗</span></a></th>
+              <td><strong>{{ animal.name }}</strong><span class="cell-detail">{{ animal.breed }}</span></td>
+              <td>{{ facade.stageLabel(animal.stage) }}</td><td>{{ facade.lotLabel(animal.lot) }}</td>
+              <td><span class="badge" [class.success]="animal.collar?.connection === 'connected'" [class.warning]="animal.collar?.connection === 'disconnected'" [class.neutral]="!animal.collar">{{ facade.collarLabel(animal) }}</span>@if (animal.collar) { <span class="cell-detail mono">{{ animal.collar.id }}</span> }</td>
+              <td><span class="badge" [class.neutral]="animal.status === 'inactive'" [class.success]="animal.status === 'active' && animal.health === 'healthy'" [class.warning]="animal.status === 'active' && animal.health === 'observation'">{{ facade.statusLabel(animal) }}</span></td>
+            </tr>
+          }</tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state" role="status"><h3>{{ locale.text('No animals match', 'No hay animales que coincidan') }}</h3><p>{{ locale.text('Try another tag, name or filter.', 'Prueba otro arete, nombre o filtro.') }}</p><button mat-button class="btn secondary" type="button" (click)="resetFilters()">{{ locale.text('Reset filters', 'Restablecer filtros') }}</button></div>
+    }
+    <footer class="pagination">
+      <p role="status" aria-live="polite" aria-atomic="true">{{ locale.number(rangeStart()) }}–{{ locale.number(rangeEnd()) }} {{ locale.text('of', 'de') }} {{ locale.number(filtered().length) }} · {{ locale.text('Page', 'Página') }} {{ locale.number(currentPage()) }} / {{ locale.number(pages()) }}</p>
+      <div class="pagination-actions"><button mat-button class="btn secondary" type="button" (click)="previous()" [disabled]="currentPage() === 1">{{ locale.text('Previous', 'Anterior') }}</button><button mat-button class="btn secondary" type="button" (click)="next()" [disabled]="currentPage() === pages()">{{ locale.text('Next', 'Siguiente') }}</button></div>
+    </footer>
+  </section>
+</div>
