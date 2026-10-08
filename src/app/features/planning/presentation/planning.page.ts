@@ -38,8 +38,8 @@ export class PlanningPage {
   readonly availableAnimals = computed(() => this.chosenLot()?.animals.filter(animal => animal.active) ?? []);
   readonly formOverlaps = computed(() => withdrawalOverlaps(this.planning.context().herdId,
     this.availableAnimals().slice(0, this.formValue().animalCount ?? 0).map(animal => animal.id), this.formValue().date ?? '', this.planning.snapshot().withdrawals));
-  readonly monthTitle = computed(() => { this.locale.locale(); return this.locale.date(new Date(`${this.planning.month()}T12:00:00Z`), { month: 'long', year: 'numeric', timeZone: 'UTC' }); });
-  readonly weekdays = computed(() => { this.locale.locale(); return Array.from({ length: 7 }, (_, index) => this.locale.date(new Date(`${shiftDate('2026-10-05', index)}T12:00:00Z`), { weekday: 'short', timeZone: 'UTC' })); });
+  readonly monthTitle = computed(() => { this.locale.locale(); return this.locale.date(new Date(`${this.planning.month()}T12:00:00Z`), { month: 'long', year: 'numeric', day: undefined, timeZone: 'UTC' }); });
+  readonly weekdays = computed(() => { this.locale.locale(); return Array.from({ length: 7 }, (_, index) => this.locale.date(new Date(`${shiftDate('2026-10-05', index)}T12:00:00Z`), { weekday: 'short', day: undefined, month: undefined, year: undefined, timeZone: 'UTC' })); });
   readonly listEntries = computed(() => this.planning.view() === 'agenda' ? this.planning.monthEntries() : this.planning.dayEntries());
   readonly statusOptions: readonly (DisplayStatus | 'all')[] = ['all', 'scheduled', 'in-progress', 'overdue', 'completed', 'not-applicable'];
   readonly typeOptions: readonly CampaignType[] = ['vaccination', 'parasite-control', 'general-care'];
