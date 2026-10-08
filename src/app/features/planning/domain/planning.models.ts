@@ -5,7 +5,7 @@ export type CampaignStatus = 'scheduled' | 'in-progress' | 'completed';
 export type ReviewStatus = 'scheduled' | 'completed' | 'not-applicable';
 export type DisplayStatus = CampaignStatus | 'overdue' | 'not-applicable';
 export type CampaignType = 'vaccination' | 'parasite-control' | 'general-care';
-export interface PlanningAnimal { readonly id: string; readonly tag: string; readonly active: boolean; }
+export interface PlanningAnimal { readonly id: string; readonly tag: string; readonly active: boolean; readonly name?: LocalizedName; }
 export interface PlanningLot { readonly id: string; readonly name: LocalizedName; readonly animals: readonly PlanningAnimal[]; }
 export interface CampaignApplication { readonly animalId: string; readonly at: string; }
 export interface CampaignReminder { readonly leadDays: number; readonly emittedAt?: string; readonly acknowledgedAt?: string; }
@@ -38,7 +38,7 @@ export interface WithdrawalPeriod {
   readonly start: string;
   readonly end: string;
   readonly product: LocalizedName;
-  readonly destination: 'milk' | 'meat';
+  readonly destination: 'milk' | 'meat' | 'unknown';
   readonly source: 'demo-clinical-record' | 'unknown';
 }
 export interface PlanningSnapshot {
