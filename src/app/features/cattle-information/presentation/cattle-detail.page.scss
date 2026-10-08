@@ -127,6 +127,8 @@ h3 { margin-block-end: .4rem; font-size: .98rem; }
 .compact-record { margin: 0; }
 .compact-record > div { padding-block: .7rem; border-block-start: 1px solid var(--cattle-rule); }
 .collar-note { margin: .85rem 0 0; font-size: .78rem; line-height: 1.55; }
+.monitoring-panel .panel-body > p { margin-block-end: .75rem; font-size: .82rem; }
+.monitoring-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; max-width: 100%; padding-inline: .9rem; text-align: center; text-decoration: none; white-space: normal; }
 .action-intro { margin-block-end: .8rem; font-size: .82rem; }
 
 .action-list, .action-panel form { display: grid; gap: .85rem; }
