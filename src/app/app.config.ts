@@ -12,6 +12,9 @@ import { MockOperationsAdapter } from './features/operations-monitoring/infrastr
 import { PlanningRepository } from './features/planning/domain/planning.repository';
 import { MockPlanningAdapter } from './features/planning/infrastructure/mock-planning.adapter';
 import { ComposedOverviewSource } from './core/config/overview-source';
+import { SubscriptionFacade } from './features/subscription-plans/application/subscription.facade';
+import { PlanCatalogPort, SubscriptionRepositoryPort } from './features/subscription-plans/domain/subscription.ports';
+import { MockSubscriptionAdapter } from './features/subscription-plans/infrastructure/mock-subscription.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,5 +27,8 @@ export const appConfig: ApplicationConfig = {
     { provide: OperationsRepository, useExisting: MockOperationsAdapter },
     { provide: PlanningRepository, useExisting: MockPlanningAdapter },
     { provide: OverviewSource, useExisting: ComposedOverviewSource },
+    SubscriptionFacade,
+    { provide: PlanCatalogPort, useExisting: MockSubscriptionAdapter },
+    { provide: SubscriptionRepositoryPort, useExisting: MockSubscriptionAdapter },
   ],
 };
