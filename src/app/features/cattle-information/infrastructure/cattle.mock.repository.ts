@@ -5,10 +5,10 @@ import type { Cattle, Collar, ExitReason, LifeStage, Registration, Result } from
 
 function seed(id: string, herdId: string, tag: string, name: string, stage: LifeStage,
   lot: Cattle['lot'], birthDate: string, connection: Collar['connection'] | null,
-  sex: Cattle['sex'] = 'female', health: Cattle['health'] = 'healthy', breed = 'Holstein'): Cattle {
+  sex: Cattle['sex'] = 'female', health: Cattle['health'] = 'healthy', breed = 'Holstein', collarId?: string): Cattle {
   const registeredAt = birthDate > '2026-01-01' ? birthDate : '2026-01-01';
   return { id, herdId, tag, name, stage, lot, birthDate, sex, health, breed, status: 'active', registeredAt,
-    collar: connection ? { id: `CL-${tag.slice(4).padStart(4, '0')}`, connection,
+    collar: connection ? { id: collarId ?? `CL-${tag.slice(4).padStart(4, '0')}`, connection,
       lastSeen: connection === 'connected' ? '2026-10-08T10:15:00-05:00' : '2026-10-06T06:10:00-05:00' } : null,
     stages: [{ stage, from: registeredAt, to: null }], exit: null,
   };
@@ -30,7 +30,7 @@ export class CattleMockRepository extends CattleRepository {
     { ...seed('centella', 'esperanza', 'ICH-156', 'Centella', 'fattening', 'lot-05', '2025-01-11', null),
       status: 'inactive', stages: [{ stage: 'fattening', from: '2026-01-01', to: '2026-10-02' }],
       exit: { reason: 'sale', at: '2026-10-02', releasedCollarId: 'CL-0156' } },
-    seed('pucara-luna', 'pucara', 'ICH-118', 'Luna', 'dairy', 'lot-03', '2023-04-10', 'connected', 'female', 'healthy', 'Brown Swiss'),
+    seed('pucara-luna', 'pucara', 'ICH-118', 'Luna', 'dairy', 'lot-03', '2023-04-10', 'connected', 'female', 'healthy', 'Brown Swiss', 'CL-0210'),
     seed('pucara-inti', 'pucara', 'ICH-210', 'Inti', 'calf', 'lot-01', '2026-07-21', null, 'male', 'healthy', 'Brown Swiss'),
   ]);
   private readonly changes = signal(0);
