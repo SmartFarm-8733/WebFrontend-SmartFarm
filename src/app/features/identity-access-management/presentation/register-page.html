@@ -5,14 +5,14 @@
     <h2>{{ locale.text('One herd. Shared care.', 'Un hato. Cuidado compartido.') }}</h2>
     <p>{{ locale.text('Keep the rancher and veterinarian connected around each animal.', 'Conecta al ganadero y al veterinario en torno a cada animal.') }}</p>
     <ul class="auth-benefits">
-      <li>{{ locale.text('Explore sample herd records', 'Explora fichas de ejemplo') }}</li>
+      <li>{{ locale.text('Explore herd records', 'Explora fichas del hato') }}</li>
       <li>{{ locale.text('Review advisory permissions', 'Revisa permisos de asesoría') }}</li>
-      <li>{{ locale.text('Compare demo plans without payment', 'Compara planes de prueba sin pagos') }}</li>
+      <li>{{ locale.text('Compare plans and estimates', 'Compara planes y estimaciones') }}</li>
     </ul>
-    <p class="aside-note">{{ locale.text('TB1 prototype · No server account is created. Use sample details.', 'Prototipo TB1 · No se crea una cuenta en un servidor. Usa datos de ejemplo.') }}</p>
+    <p class="aside-note">{{ locale.text('Your profile stays in this session. No server account is created.', 'Tu perfil permanece en esta sesión. No se crea una cuenta en un servidor.') }}</p>
   </aside>
   <div class="auth-content">
-    <span class="eyebrow">{{ locale.text('Step 1 · Demo profile', 'Paso 1 · Perfil de prueba') }}</span>
+    <span class="eyebrow">{{ locale.text('Step 1 · Profile', 'Paso 1 · Perfil') }}</span>
     <h1 id="register-title">{{ locale.text('Make it your workspace', 'Prepara tu espacio de trabajo') }}</h1>
     <p class="page-lead">{{ locale.text('Prepare a temporary profile, then explore the plans.', 'Prepara un perfil temporal y luego explora los planes.') }}</p>
     @if (!reviewing()) {
@@ -42,7 +42,7 @@
             <p class="form-error" id="register-region-error">@if (form.controls.region.touched && form.controls.region.invalid) { {{ locale.text('Choose your region.', 'Elige tu región.') }} }</p>
           </div>
           <div class="field">
-            <label for="register-role">{{ locale.text('Demo role', 'Rol de prueba') }}</label>
+            <label for="register-role">{{ locale.text('Workspace role', 'Rol') }}</label>
             <select id="register-role" formControlName="role">
               <option value="rancher">{{ locale.text('Rancher', 'Ganadero') }}</option>
               <option value="veterinarian">{{ locale.text('Veterinarian', 'Veterinario') }}</option>
@@ -51,9 +51,9 @@
         </div>
         <label class="checkbox-field" for="register-terms">
           <input id="register-terms" type="checkbox" formControlName="terms" [attr.aria-invalid]="form.controls.terms.touched && form.controls.terms.invalid" aria-describedby="register-terms-error">
-          <span>{{ locale.text('I understand this profile uses sample data, stays in memory, and resets on reload.', 'Entiendo que este perfil usa datos de ejemplo, se guarda en memoria y se reinicia al recargar.') }}</span>
+          <span>{{ locale.text('I understand this profile stays in memory and resets on reload.', 'Entiendo que este perfil se guarda en memoria y se reinicia al recargar.') }}</span>
         </label>
-        <p class="form-error" id="register-terms-error">@if (form.controls.terms.touched && form.controls.terms.invalid) { {{ locale.text('Confirm the demo conditions to continue.', 'Confirma las condiciones de la demo para continuar.') }} }</p>
+        <p class="form-error" id="register-terms-error">@if (form.controls.terms.touched && form.controls.terms.invalid) { {{ locale.text('Accept the profile conditions to continue.', 'Acepta las condiciones del perfil para continuar.') }} }</p>
         <button mat-flat-button class="btn gold" type="submit">{{ locale.text('Review profile', 'Revisar perfil') }}</button>
       </form>
     } @else {
@@ -65,7 +65,7 @@
           <div><dt>{{ locale.text('Region', 'Región') }}</dt><dd>{{ form.controls.region.value === 'other' ? locale.text('Other region', 'Otra región') : locale.text(form.controls.region.value, form.controls.region.value) }}</dd></div>
           <div><dt>{{ locale.text('Role', 'Rol') }}</dt><dd>{{ form.controls.role.value === 'rancher' ? locale.text('Rancher', 'Ganadero') : locale.text('Veterinarian', 'Veterinario') }}</dd></div>
         </dl>
-        <p class="notice" role="status">{{ locale.text('This opens a demo session. No account is registered and no verification email is sent.', 'Esto abre una sesión de prueba. No se registra una cuenta ni se envía un correo de verificación.') }}</p>
+        <p class="notice" role="status">{{ locale.text('The profile is saved for this session only. No account is registered and no verification email is sent.', 'El perfil se guarda solo para esta sesión. No se registra una cuenta ni se envía un correo de verificación.') }}</p>
         <div class="toolbar">
           <button mat-flat-button class="btn gold" type="button" (click)="confirm()" [disabled]="entering()">{{ entering() ? locale.text('Opening plans…', 'Abriendo planes…') : locale.text('Confirm and explore plans', 'Confirmar y explorar planes') }}</button>
           <button mat-button class="btn secondary" type="button" (click)="reviewing.set(false)" [disabled]="entering()">{{ locale.text('Edit details', 'Editar datos') }}</button>

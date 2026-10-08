@@ -5,20 +5,20 @@
   <p class="page-lead">{{ locale.text('This prototype has no real accounts or email delivery.', 'Este prototipo no tiene cuentas reales ni envío de correos.') }}</p>
   <form class="stack" [formGroup]="form" (ngSubmit)="showInstructions()" novalidate>
     <div class="field">
-      <label for="recovery-email">{{ locale.text('Demo email', 'Correo de prueba') }}</label>
+      <label for="recovery-email">{{ locale.text('Email', 'Correo') }}</label>
       <input id="recovery-email" type="email" formControlName="email" autocomplete="email" maxlength="120"
         [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid" aria-describedby="recovery-email-error">
-      <p class="form-error" id="recovery-email-error">@if (form.controls.email.touched && form.controls.email.invalid) { {{ locale.text('Enter a valid email to view the demo guidance.', 'Ingresa un correo válido para ver la guía de prueba.') }} }</p>
+      <p class="form-error" id="recovery-email-error">@if (form.controls.email.touched && form.controls.email.invalid) { {{ locale.text('Enter a valid email to view recovery guidance.', 'Ingresa un correo válido para ver la guía de recuperación.') }} }</p>
     </div>
     <button mat-flat-button class="btn primary" type="submit">{{ locale.text('Show recovery guidance', 'Ver guía de recuperación') }}</button>
   </form>
   @if (instructionsVisible()) {
     <div class="notice stack" role="status">
       <strong>{{ locale.text('No email was sent.', 'No se envió ningún correo.') }}</strong>
-      <p>{{ locale.text('Return to sign in and choose Explore demo. You can enter without a password. A real recovery link will require the future authentication service.', 'Vuelve al acceso y elige Explorar demo. Puedes entrar sin contraseña. Un enlace real de recuperación requerirá el futuro servicio de autenticación.') }}</p>
+      <p>{{ locale.text('Return to sign in and choose Open workspace. Recovery links are unavailable until the authentication service is connected.', 'Vuelve al acceso y elige Abrir espacio de trabajo. Los enlaces de recuperación no están disponibles hasta conectar el servicio de autenticación.') }}</p>
     </div>
   }
-  <p class="text-muted" id="recovery-unavailable">{{ locale.text('Email reset links are unavailable in TB1.', 'Los enlaces de recuperación por correo no están disponibles en TB1.') }}</p>
+  <p class="text-muted" id="recovery-unavailable">{{ locale.text('Email reset links are currently unavailable.', 'Los enlaces de recuperación por correo no están disponibles actualmente.') }}</p>
   <button mat-button class="btn secondary" type="button" disabled aria-describedby="recovery-unavailable">{{ locale.text('Send reset email', 'Enviar correo de recuperación') }}</button>
   <a class="auth-back" routerLink="/login">{{ locale.text('Back to sign in', 'Volver al acceso') }}</a>
 </section>
