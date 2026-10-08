@@ -68,9 +68,9 @@ test('care records validate animal, note, event date, product details and withdr
 
 test('overlapping withdrawal for the same animal and product requires explicit review', () => {
   const adapter = new MockOperationsAdapter();
-  const input = careInput({ product: ' demo-p01 ', withdrawalEnd: '2026-10-15' });
+    const input = careInput({ product: ' p01 ', withdrawalEnd: '2026-10-15' });
 
   expect(adapter.record('esperanza', 'veterinarian', input, demoNow)).toEqual({ ok: false, error: 'withdrawal-review' });
   expect(adapter.record('esperanza', 'veterinarian', { ...input, withdrawalReviewed: true }, demoNow)).toEqual({ ok: true });
-  expect(adapter.read('esperanza', 'veterinarian').records.at(-1)?.product).toBe('demo-p01');
+    expect(adapter.read('esperanza', 'veterinarian').records.at(-1)?.product).toBe('p01');
 });

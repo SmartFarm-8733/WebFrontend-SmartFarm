@@ -79,7 +79,7 @@ export class PlanningPage {
   }
   noticeText(): string {
     switch (this.planning.notice()) {
-      case 'scheduled': return this.locale.text('Campaign saved in the demo calendar.', 'Campaña guardada en el calendario de demostración.');
+      case 'scheduled': return this.locale.text('Campaign saved in the calendar.', 'Campaña guardada en el calendario.');
       case 'applied': return this.locale.text('Application recorded. Progress updated.', 'Aplicación registrada. Avance actualizado.');
       case 'reminder': return this.locale.text('Reminder marked as read.', 'Recordatorio marcado como leído.');
       default: return '';

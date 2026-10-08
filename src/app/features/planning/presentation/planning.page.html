@@ -15,11 +15,11 @@
   @if (!planning.snapshot().authorized) {
     <section class="notice access-notice" role="status" aria-live="polite">
       <h2>{{ locale.text('Planning is unavailable for this herd', 'La planificación no está disponible para este hato') }}</h2>
-      <p>{{ locale.text('No planning records are available in this demo for the selected veterinary herd.', 'Esta demostración no ofrece registros de planificación para el hato veterinario seleccionado.') }}</p>
+      <p>{{ locale.text('No planning records are available for the selected veterinary herd.', 'No hay registros de planificación disponibles para el hato veterinario seleccionado.') }}</p>
     </section>
   } @else {
     <p class="notice fixture-note" role="note">
-      {{ locale.text('Campaign schedules, follow-ups and application progress are illustrative. Membership includes only identified tag fixtures, not a full herd census. Lucero’s 6–12 October withdrawal is copied from the Operations demo fixture; product and destination are unspecified, and no live Operations sync is connected.', 'Las programaciones de campañas, los seguimientos y el avance de aplicaciones son ilustrativos. La membresía incluye solo etiquetas identificadas, no un censo completo del hato. El retiro de Lucero del 6 al 12 de octubre se copia del fixture de demostración de Operations; no se especifican producto ni destino y no hay sincronización en vivo con Operations.') }}
+      {{ locale.text('Campaign membership includes identified animals only. Clinical records are not synchronized automatically. Review withdrawal periods before recording an application.', 'Las campañas incluyen solo animales identificados. Los registros clínicos no se sincronizan automáticamente. Revisa los periodos de retiro antes de registrar una aplicación.') }}
     </p>
     @if (!planning.canEdit()) {
       <section class="notice read-only-notice" role="status">
@@ -188,7 +188,7 @@
             @if (formOverlaps().length > 0) {
               <aside class="notice withdrawal-warning" aria-labelledby="withdrawal-warning-title">
                 <h3 id="withdrawal-warning-title">{{ locale.text('Withdrawal period overlaps this date', 'Hay un periodo de retiro que coincide con esta fecha') }}</h3>
-                <p>{{ locale.text('Review these demo clinical records before applying treatment:', 'Revisa estos registros clínicos de demostración antes de aplicar el tratamiento:') }}</p>
+                <p>{{ locale.text('Review these clinical records before applying treatment:', 'Revisa estos registros clínicos antes de aplicar el tratamiento:') }}</p>
                 <ul>
                   @for (period of formOverlaps(); track period.animalId + period.start) {
                     <li><span class="mono">{{ planning.animalTag(period.animalId) }}</span> · {{ name(period.product) }} · {{ date(period.start) }}–{{ date(period.end) }} · {{ period.destination === 'milk' ? locale.text('milk restricted', 'retiro de leche') : period.destination === 'meat' ? locale.text('meat restricted', 'retiro de carne') : locale.text('destination unspecified', 'destino sin especificar') }}</li>

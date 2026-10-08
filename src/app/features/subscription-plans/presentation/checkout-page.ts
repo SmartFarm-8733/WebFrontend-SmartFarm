@@ -77,8 +77,8 @@ export class CheckoutPage {
 
   deviceLimitLabel(): string {
     return this.locale.text(
-      'Numeric device quota not specified; the report ties it to herd size.',
-      'La cuota numérica de dispositivos no está especificada; el informe la vincula al tamaño del hato.',
+      'Device quota to be confirmed for your herd size.',
+      'Cuota de dispositivos por confirmar según el tamaño del hato.',
     );
   }
 
@@ -104,7 +104,7 @@ export class CheckoutPage {
   activationMessage(result: DemoActivationResult): string {
     switch (result.kind) {
       case 'activated': return this.locale.text(
-        'Demo selection recorded in memory. No payment was processed and no plan entitlements changed.',
+        'Selection saved for this session. No payment was processed and no plan entitlements changed.',
         'Selección de prueba guardada en memoria. No se procesó ningún pago ni cambiaron las prestaciones del plan.',
       );
       case 'invalid-plan': return this.locale.text(

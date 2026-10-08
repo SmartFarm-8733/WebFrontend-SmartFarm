@@ -158,16 +158,16 @@ export class DevicesPage {
 
   messageText(message: 'linked' | 'released' | DeviceError): string {
     const messages: Record<'linked' | 'released' | DeviceError, DeviceText> = {
-      linked: { en: 'Collar linked in this demo.', es: 'Collar vinculado en esta demo.' },
+      linked: { en: 'Collar linked.', es: 'Collar vinculado.' },
       released: { en: 'Collar released. Assignment history preserved.', es: 'Collar liberado. Se conservó el historial de asignación.' },
       'read-only': { en: 'Veterinary access is read-only.', es: 'El acceso veterinario es de solo lectura.' },
       unauthorized: { en: 'Select an authorized herd.', es: 'Selecciona un hato autorizado.' },
       'device-not-found': { en: 'Device not found in this herd.', es: 'No se encontró el dispositivo en este hato.' },
       'not-collar': { en: 'Only collars can be linked to animals.', es: 'Solo los collares se vinculan a animales.' },
       'already-assigned': { en: 'Release the current assignment first.', es: 'Libera primero la asignación actual.' },
-      'animal-not-found': { en: 'Choose a known demo animal in this herd.', es: 'Elige un animal conocido de este hato en la demo.' },
+      'animal-not-found': { en: 'Choose an animal in this herd.', es: 'Elige un animal de este hato.' },
       'animal-already-linked': { en: 'This animal already has a collar.', es: 'Este animal ya tiene un collar.' },
-      'plan-limit': { en: 'The demo collar allowance is full. Release a collar first.', es: 'Se alcanzó el límite de collares de la demo. Libera un collar primero.' },
+      'plan-limit': { en: 'The collar allowance is full. Release a collar first.', es: 'Se alcanzó el límite de collares. Libera un collar primero.' },
       'not-assigned': { en: 'This collar is already unassigned.', es: 'Este collar ya está sin asignar.' },
       'reason-required': { en: 'Choose a release reason.', es: 'Elige un motivo para liberar.' },
       'invalid-time': { en: 'The assignment time is invalid.', es: 'La hora de asignación no es válida.' },

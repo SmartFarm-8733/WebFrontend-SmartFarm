@@ -2,9 +2,9 @@
   <div>
     <span class="eyebrow">{{ locale.text('OPERATIONS / ICHU', 'OPERACIONES / ICHU') }}</span>
     <h1>{{ locale.text('Alerts', 'Alertas') }}</h1>
-    <p class="page-lead">{{ facade.workspace.herdName() }} · {{ locale.text('Prioritized demo signals with recorded responses', 'Señales de muestra priorizadas con respuestas registradas') }}</p>
+    <p class="page-lead">{{ facade.workspace.herdName() }} · {{ locale.text('Prioritized signals with recorded responses', 'Señales priorizadas con respuestas registradas') }}</p>
   </div>
-  <span class="badge warning">{{ locale.text('Demo data · no push sent', 'Datos de demo · no se envían notificaciones') }}</span>
+  <span class="badge warning">{{ locale.text('Notifications unavailable', 'Notificaciones no disponibles') }}</span>
 </header>
 
 <section class="stats-grid" [attr.aria-label]="locale.text('Alert overview', 'Resumen de alertas')">
@@ -99,7 +99,7 @@
                   <div class="field">
                     <label for="alert-response-note">{{ locale.text('Finding or action taken', 'Hallazgo o acción realizada') }}</label>
                     <textarea id="alert-response-note" formControlName="note" rows="3" maxlength="500" required [attr.aria-invalid]="responseForm.controls.note.invalid && responseForm.controls.note.touched ? 'true' : null" [attr.aria-describedby]="responseForm.controls.note.invalid && responseForm.controls.note.touched ? 'alert-note-hint alert-note-error' : 'alert-note-hint'"></textarea>
-                    <span id="alert-note-hint" class="text-muted">{{ locale.text('5–500 characters. This demo stores the note locally and sends no notification.', 'De 5 a 500 caracteres. Esta demo guarda la nota localmente y no envía notificaciones.') }}</span>
+                    <span id="alert-note-hint" class="text-muted">{{ locale.text('5–500 characters. The note is stored locally; no notification is sent.', 'De 5 a 500 caracteres. La nota se guarda localmente; no se envía una notificación.') }}</span>
                     @if (responseForm.controls.note.invalid && responseForm.controls.note.touched) { <span id="alert-note-error" class="form-error" role="alert">{{ locale.text('Enter a note between 5 and 500 characters.', 'Escribe una nota de 5 a 500 caracteres.') }}</span> }
                   </div>
                   <div class="response-actions">

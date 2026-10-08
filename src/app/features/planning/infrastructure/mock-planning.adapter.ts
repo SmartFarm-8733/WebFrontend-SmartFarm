@@ -30,7 +30,7 @@ const ESPERANZA_LOTS: readonly PlanningLot[] = [
   ]),
 ];
 const PUCARA_LOTS: readonly PlanningLot[] = [
-  lot('pucara', 'identified-animals', { en: 'Known animals · demo group', es: 'Animales conocidos · grupo demo' }, [
+  lot('pucara', 'identified-animals', { en: 'Identified animals', es: 'Animales identificados' }, [
     animal('pucara', 'ICH118', 'Luna'), animal('pucara', 'ICH210', 'Inti'),
   ]),
 ];

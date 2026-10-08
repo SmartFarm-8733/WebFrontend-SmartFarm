@@ -41,7 +41,7 @@
         <strong class="stat-value">
           {{ locale.number(facade.inventory().plan.assigned) }}<span class="stat-total"> / {{ locale.number(facade.inventory().plan.limit) }}</span>
         </strong>
-        <span class="stat-note">{{ locale.text('Demo plan allowance', 'Límite del plan de demo') }}</span>
+        <span class="stat-note">{{ locale.text('Collar allowance', 'Límite de collares') }}</span>
       </article>
     </section>
 
@@ -322,14 +322,14 @@
                           <span class="form-error" id="assignment-animal-error" role="alert">{{ locale.text('Select an animal to continue.', 'Selecciona un animal para continuar.') }}</span>
                         } @else {
                           <span class="field-help" id="assignment-animal-help">
-                            {{ locale.text('Demo limit: ', 'Límite de demo: ') }}{{ locale.number(facade.inventory().plan.assigned) }} / {{ locale.number(facade.inventory().plan.limit) }}
+                            {{ locale.text('Collar limit: ', 'Límite de collares: ') }}{{ locale.number(facade.inventory().plan.assigned) }} / {{ locale.number(facade.inventory().plan.limit) }}
                           </span>
                         }
                       </div>
                       @if (facade.availableAnimals().length === 0) {
                         <p class="notice notice-warning">
-                          {{ locale.text('Every demo animal already has a collar. Unassign one before linking another.',
-                            'Todos los animales de demo ya tienen collar. Desvincula uno antes de asignar otro.') }}
+                          {{ locale.text('Every available animal already has a collar. Unassign one before linking another.',
+                            'Todos los animales disponibles ya tienen collar. Desvincula uno antes de asignar otro.') }}
                         </p>
                       }
                       <button class="btn primary" type="submit" [disabled]="facade.availableAnimals().length === 0">

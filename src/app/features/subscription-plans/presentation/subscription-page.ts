@@ -67,8 +67,8 @@ export class SubscriptionPage {
 
   deviceLimitLabel(): string {
     return this.locale.text(
-      'Numeric device quota not specified; the report ties it to herd size.',
-      'La cuota numérica de dispositivos no está especificada; el informe la vincula al tamaño del hato.',
+      'Device quota to be confirmed for your herd size.',
+      'Cuota de dispositivos por confirmar según el tamaño del hato.',
     );
   }
 

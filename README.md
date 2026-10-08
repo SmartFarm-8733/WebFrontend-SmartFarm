@@ -11,7 +11,7 @@ npm start
 
 Default Angular development URL: http://localhost:4200.
 
-Open **Explore demo** and choose a rancher or veterinarian role. Use the header to select a herd, switch roles or change between English and Spanish. No credentials are required.
+Open **Open workspace** and choose a rancher or veterinarian role. Use the header to select a herd, switch roles or change between English and Spanish. No credentials are required.
 
 On Windows machines where Application Control blocks the native build parser, use the optional Angular Webpack compatibility target:
 

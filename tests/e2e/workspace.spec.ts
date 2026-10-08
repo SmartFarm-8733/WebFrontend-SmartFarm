@@ -4,7 +4,7 @@ import AxeBuilder from '@axe-core/playwright';
 async function enter(page: Page, role = 'rancher'): Promise<void> {
   await page.goto('/login');
   await page.locator('#login-role').selectOption(role);
-  await page.getByRole('button', { name: 'Explore demo', exact: true }).click();
+  await page.getByRole('button', { name: 'Open workspace', exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 }
 
@@ -91,7 +91,7 @@ test('mobile screens fit the viewport and the drawer is usable', async ({ page }
 
 test('leaving the demo does not persist credentials or a session', async ({ page }) => {
   await enter(page);
-  await page.getByRole('button', { name: 'Leave demo', exact: true }).click();
+  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.goto('/devices');
   await expect(page).toHaveURL(/\/login$/);

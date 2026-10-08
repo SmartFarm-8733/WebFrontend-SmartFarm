@@ -4,20 +4,19 @@
     <span class="eyebrow">{{ locale.text('Field care, connected', 'Cuidado de campo, conectado') }}</span>
     <h1 id="login-title">{{ locale.text('Welcome to ICHU', 'Bienvenido a ICHU') }}</h1>
     <p class="page-lead">{{ locale.text('Follow your herd. Work closer to your veterinary team.', 'Sigue a tu hato. Trabaja más cerca de tu equipo veterinario.') }}</p>
-    <div class="notice" id="login-demo-note">{{ locale.text('TB1 demo · Sample data only. No credentials needed.', 'Demo TB1 · Solo datos de ejemplo. No necesitas credenciales.') }}</div>
     <div class="field">
       <label for="login-role">{{ locale.text('Explore as', 'Explorar como') }}</label>
-      <select id="login-role" [formControl]="role" aria-describedby="login-demo-note">
+      <select id="login-role" [formControl]="role">
         <option value="rancher">{{ locale.text('Rancher', 'Ganadero') }}</option>
         <option value="veterinarian">{{ locale.text('Veterinarian', 'Veterinario') }}</option>
       </select>
     </div>
     <button mat-flat-button class="btn gold full-width" type="button" [disabled]="entering()" (click)="exploreDemo()">
-      {{ entering() ? locale.text('Opening demo…', 'Abriendo demo…') : locale.text('Explore demo', 'Explorar demo') }}
+      {{ entering() ? locale.text('Opening workspace…', 'Abriendo espacio de trabajo…') : locale.text('Open workspace', 'Abrir espacio de trabajo') }}
     </button>
     <details class="credential-demo">
       <summary>{{ locale.text('Try the sign-in form', 'Probar el formulario de acceso') }}</summary>
-      <p id="credential-note" class="text-muted">{{ locale.text('This checks format only and opens the same demo. Your password is cleared and never saved.', 'Solo revisa el formato y abre la misma demo. Tu contraseña se borra y nunca se guarda.') }}</p>
+      <p id="credential-note" class="text-muted">{{ locale.text('This checks format only; credentials are not verified. Your password is cleared and never saved.', 'Solo revisa el formato; no se verifican credenciales. Tu contraseña se borra y nunca se guarda.') }}</p>
       <form class="stack" [formGroup]="credentials" (ngSubmit)="checkDemoForm()" novalidate aria-describedby="credential-note">
         <div class="field">
           <label for="login-email">{{ locale.text('Email', 'Correo') }}</label>
@@ -26,7 +25,7 @@
           <p class="form-error" id="login-email-error">@if (credentials.controls.email.touched && credentials.controls.email.invalid) { {{ locale.text('Enter a valid email.', 'Ingresa un correo válido.') }} }</p>
         </div>
         <div class="field">
-          <label for="login-password">{{ locale.text('Demo password', 'Contraseña de prueba') }}</label>
+          <label for="login-password">{{ locale.text('Password', 'Contraseña') }}</label>
           <input id="login-password" type="password" formControlName="password" autocomplete="off" minlength="8" maxlength="128"
             [attr.aria-invalid]="credentials.controls.password.touched && credentials.controls.password.invalid" aria-describedby="login-password-error">
           <p class="form-error" id="login-password-error">@if (credentials.controls.password.touched && credentials.controls.password.invalid) { {{ locale.text('Use 8–128 characters for this format check.', 'Usa entre 8 y 128 caracteres para revisar el formato.') }} }</p>
@@ -35,10 +34,10 @@
       </form>
     </details>
     @if (navigationFailed()) {
-      <p class="form-error" role="alert">{{ locale.text('The demo destination could not open. Try Explore demo again.', 'No se pudo abrir el destino. Intenta explorar la demo otra vez.') }}</p>
+      <p class="form-error" role="alert">{{ locale.text('The workspace could not open. Please try again.', 'No se pudo abrir el espacio de trabajo. Inténtalo de nuevo.') }}</p>
     }
     <nav class="auth-links" [attr.aria-label]="locale.text('Account options', 'Opciones de cuenta')">
-      <a routerLink="/register">{{ locale.text('Create a demo profile', 'Crear un perfil de prueba') }}</a>
+      <a routerLink="/register">{{ locale.text('Create a profile', 'Crear un perfil') }}</a>
       <a routerLink="/recover">{{ locale.text('Forgot your password?', '¿Olvidaste tu contraseña?') }}</a>
     </nav>
   </div>
