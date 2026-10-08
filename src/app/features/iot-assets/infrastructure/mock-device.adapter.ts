@@ -6,9 +6,9 @@ import {
 import { DeviceRepository } from '../domain/device.repository';
 
 export const DEMO_DEVICE_CAP = 12;
-export const DEMO_AUTHORIZED_HERDS: readonly string[] = ['esperanza', 'pucara'];
+export const DEMO_RANCHER_HERDS: readonly string[] = ['esperanza', 'pucara'];
 
-const ANIMALS: readonly KnownAnimal[] = [
+export const DEMO_ANIMALS: readonly KnownAnimal[] = [
   { id: 'lucero', herdId: 'esperanza', earTag: 'ICH-118', name: 'Lucero' },
   { id: 'margarita', herdId: 'esperanza', earTag: 'ICH-104', name: 'Margarita' },
   { id: 'canela', herdId: 'esperanza', earTag: 'ICH-126', name: 'Canela' },
@@ -22,12 +22,17 @@ const ANIMALS: readonly KnownAnimal[] = [
   { id: 'pucara-inti', herdId: 'pucara', earTag: 'ICH-210', name: 'Inti' },
 ];
 
+export function isDeviceAccessAuthorized(access: DeviceAccess): boolean {
+  if (access.role === 'rancher') return DEMO_RANCHER_HERDS.includes(access.herdId);
+  return access.role === 'veterinarian' && access.herdId === 'esperanza';
+}
+
 function collar(
   id: string, animalId: string | null, battery: number | null, connection: ConnectionState,
   capturedAt: string | null, lastSeen: string | null, temperatureC: number | null,
   pendingReadings = 0, herdId = 'esperanza',
 ): CollarDevice {
-  const animal = ANIMALS.find((entry) => entry.id === animalId);
+  const animal = DEMO_ANIMALS.find((entry) => entry.id === animalId);
   return {
     id, herdId, type: 'collar', connection, battery, capturedAt, lastSeen, temperatureC,
     firmware: '2.4.1', pendingReadings,
@@ -62,8 +67,8 @@ function seedDevices(): IoTDevice[] {
       capturedAt: '2026-10-08T10:27:00-05:00', lastSeen: '2026-10-08T10:27:10-05:00',
       firmware: '1.8.2', pendingReadings: 0, location: { en: 'Main pasture', es: 'Potrero principal' }, bufferedReadings: 216,
     },
-    collar('CL-0118', 'pucara-luna', 53, 'online', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
-    collar('CL-0301', null, 53, 'offline', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
+    collar('CL-0301', 'pucara-luna', 53, 'online', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
+    collar('CL-0210', 'pucara-inti', 53, 'offline', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
     collar('CL-0302', null, null, 'never-seen', null, null, null, 0, 'pucara'),
     {
       id: 'WT-0002', herdId: 'pucara', type: 'water-controller', connection: 'never-seen', battery: null,
@@ -73,9 +78,11 @@ function seedDevices(): IoTDevice[] {
   ];
 }
 
+export const DEMO_DEVICE_FIXTURES: readonly IoTDevice[] = seedDevices();
+
 @Injectable({ providedIn: 'root' })
 export class MockDeviceAdapter extends DeviceRepository {
-  private devices = seedDevices();
+  private devices: IoTDevice[] = DEMO_DEVICE_FIXTURES.map((device) => structuredClone(device));
   private readonly updates = signal(0);
   readonly revision = this.updates.asReadonly();
 
@@ -85,7 +92,7 @@ export class MockDeviceAdapter extends DeviceRepository {
     const devices = authorized ? this.devices.filter((device) => device.herdId === access.herdId) : [];
     return structuredClone({
       authorized, devices,
-      animals: authorized ? ANIMALS.filter((animal) => animal.herdId === access.herdId) : [],
+      animals: authorized ? DEMO_ANIMALS.filter((animal) => animal.herdId === access.herdId) : [],
       plan: { assigned: devices.filter((device) => device.type === 'collar' && device.assignment !== null).length,
         limit: DEMO_DEVICE_CAP, source: 'demo' },
     });
@@ -98,7 +105,7 @@ export class MockDeviceAdapter extends DeviceRepository {
     if (!device) return { ok: false, error: 'device-not-found' };
     if (device.type !== 'collar') return { ok: false, error: 'not-collar' };
     if (device.assignment) return { ok: false, error: 'already-assigned' };
-    const animal = ANIMALS.find((entry) => entry.id === animalId && entry.herdId === access.herdId);
+    const animal = DEMO_ANIMALS.find((entry) => entry.id === animalId && entry.herdId === access.herdId);
     if (!animal) return { ok: false, error: 'animal-not-found' };
     const inventory = this.inventory(access);
     if (inventory.devices.some((entry) => entry.type === 'collar' && entry.assignment?.animal.id === animalId)) {
@@ -128,7 +135,7 @@ export class MockDeviceAdapter extends DeviceRepository {
   }
 
   private authorized(access: DeviceAccess): boolean {
-    return (access.role === 'rancher' || access.role === 'veterinarian') && DEMO_AUTHORIZED_HERDS.includes(access.herdId);
+    return isDeviceAccessAuthorized(access);
   }
 
   private writeError(access: DeviceAccess, at: string): DeviceError | null {
