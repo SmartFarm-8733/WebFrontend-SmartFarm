@@ -41,6 +41,6 @@ export function deriveMetrics(snapshot: HerdOverview): PeriodMetrics {
 }
 export function csvCell(value: string | number): string {
   const text = String(value);
-  const safe = /^[=+\-@\t\r]/.test(text) ? "'" + text : text;
+  const safe = /^\s*[=+\-@]|^[\t\r\n]/.test(text) ? "'" + text : text;
   return '"' + safe.replaceAll('"', '""') + '"';
 }
