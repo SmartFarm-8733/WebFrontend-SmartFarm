@@ -31,8 +31,8 @@ test('registration leads to a demo checkout with no sensitive payment fields', a
   await expect(page).toHaveURL(/\/checkout\?/);
   await expect(page.locator('input')).toHaveCount(2);
   await page.locator('#checkout-terms').check();
-  await page.getByRole('button', { name: 'Simulate demo activation', exact: true }).click();
-  await expect(page.locator('.activation-result')).toContainText(/demo|simulat/i);
+  await page.getByRole('button', { name: 'Save selection', exact: true }).click();
+  await expect(page.locator('.activation-result')).toContainText('Selection saved for this session. No payment was processed');
   const findings = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
   expect(findings.violations.map(item => ({ id: item.id, nodes: item.nodes.map(node => node.target) }))).toEqual([]);
 });

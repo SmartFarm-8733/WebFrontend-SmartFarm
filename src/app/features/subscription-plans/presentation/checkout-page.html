@@ -1,8 +1,8 @@
 <header class="page-heading">
   <div>
     <span class="eyebrow">{{ locale.text('Plan summary', 'Resumen del plan') }}</span>
-    <h1>{{ locale.text('Review your demo selection', 'Revisa tu selección de prueba') }}</h1>
-    <p class="page-lead">{{ locale.text('No payment details are requested. This screen only simulates an activation.', 'No se solicitan datos de pago. Esta pantalla solo simula una activación.') }}</p>
+    <h1>{{ locale.text('Review your selection', 'Revisa tu selección') }}</h1>
+    <p class="page-lead">{{ locale.text('Review the estimate and save your selection. No payment details are requested.', 'Revisa la estimación y guarda tu selección. No se solicitan datos de pago.') }}</p>
   </div>
   <a mat-button class="btn secondary" routerLink="/plans">{{ locale.text('Change plan', 'Cambiar plan') }}</a>
 </header>
@@ -11,8 +11,8 @@
   <section class="panel checkout-form-panel" aria-labelledby="checkout-details-title">
     <div class="panel-head">
       <div>
-        <h2 id="checkout-details-title">{{ locale.text('Demo details', 'Datos de prueba') }}</h2>
-        <p class="text-muted">{{ locale.text('Only herd size and demo terms are needed.', 'Solo se requiere el tamaño del hato y aceptar los términos de prueba.') }}</p>
+        <h2 id="checkout-details-title">{{ locale.text('Herd details', 'Datos del hato') }}</h2>
+        <p class="text-muted">{{ locale.text('Enter the herd size and accept the selection conditions.', 'Ingresa el tamaño del hato y acepta las condiciones de selección.') }}</p>
       </div>
     </div>
     <div class="panel-body">
@@ -26,7 +26,7 @@
           <input id="checkout-head-count" type="number" min="1" step="1" inputmode="numeric"
             formControlName="headCount" [attr.aria-invalid]="form.controls.headCount.touched && form.controls.headCount.invalid"
             aria-describedby="checkout-head-count-help checkout-head-count-error">
-          <span class="text-muted" id="checkout-head-count-help">{{ locale.text('This changes only the illustrative estimate.', 'Esto solo cambia la estimación ilustrativa.') }}</span>
+          <span class="text-muted" id="checkout-head-count-help">{{ locale.text('This updates the estimate only.', 'Esto solo actualiza la estimación.') }}</span>
           <p class="form-error" id="checkout-head-count-error" role="alert">
             @if (form.controls.headCount.touched && form.controls.headCount.invalid) {
               {{ locale.text('Enter a positive whole number of heads.', 'Ingresa un número entero positivo de cabezas.') }}
@@ -45,7 +45,7 @@
         }
 
         <div class="notice demo-terms" id="demo-terms">
-          <strong>{{ locale.text('Demo terms', 'Términos de prueba') }}</strong>
+          <strong>{{ locale.text('Selection conditions', 'Condiciones de selección') }}</strong>
           <p>{{ locale.text('This action stores a temporary in-memory selection only. It does not create a paid subscription, process a payment, or enable plan features.', 'Esta acción solo guarda una selección temporal en memoria. No crea una suscripción pagada, procesa pagos ni habilita funciones del plan.') }}</p>
         </div>
 
@@ -54,17 +54,17 @@
             <input id="checkout-terms" type="checkbox" formControlName="termsAccepted"
               [attr.aria-invalid]="form.controls.termsAccepted.touched && form.controls.termsAccepted.invalid"
               aria-describedby="demo-terms checkout-terms-error">
-            <span>{{ locale.text('I agree to continue with this demo-only selection.', 'Acepto continuar con esta selección exclusiva de la demo.') }}</span>
+            <span>{{ locale.text('I agree to save this selection without a payment or plan activation.', 'Acepto guardar esta selección sin pago ni activación del plan.') }}</span>
           </label>
           <p class="form-error" id="checkout-terms-error" role="alert">
             @if (form.controls.termsAccepted.touched && form.controls.termsAccepted.invalid) {
-              {{ locale.text('Accept the demo terms to continue.', 'Acepta los términos de prueba para continuar.') }}
+              {{ locale.text('Accept the selection conditions to continue.', 'Acepta las condiciones de selección para continuar.') }}
             }
           </p>
         </div>
 
         <button mat-flat-button class="btn gold" type="submit" [disabled]="!canActivate()">
-          {{ locale.text('Simulate demo activation', 'Simular activación de prueba') }}
+          {{ locale.text('Save selection', 'Guardar selección') }}
         </button>
       </form>
 
@@ -77,14 +77,14 @@
   <aside class="panel checkout-summary" aria-labelledby="checkout-summary-title">
     <div class="panel-head">
       <h2 id="checkout-summary-title">{{ locale.text('Order summary', 'Resumen de selección') }}</h2>
-      <span class="badge neutral">{{ locale.text('Demo only', 'Solo demo') }}</span>
+      <span class="badge neutral">{{ locale.text('Estimate only', 'Solo estimación') }}</span>
     </div>
     <div class="panel-body stack">
       @if (selectedPlan(); as plan) {
         <div class="summary-row"><span>{{ locale.text('Plan', 'Plan') }}</span><strong>{{ planName(plan.id) }}</strong></div>
         <div class="summary-row"><span>{{ locale.text('Workspace', 'Espacio de trabajo') }}</span><strong>{{ workspace.herdName() }}</strong></div>
         @if (session.active()) {
-          <div class="summary-row"><span>{{ locale.text('Demo profile', 'Perfil de prueba') }}</span><strong>{{ session.name() }}</strong></div>
+          <div class="summary-row"><span>{{ locale.text('Profile', 'Perfil') }}</span><strong>{{ session.name() }}</strong></div>
         }
         <div class="summary-row"><span>{{ locale.text('Role', 'Rol') }}</span><strong>{{ workspace.role() === 'veterinarian' ? locale.text('Veterinarian', 'Veterinario') : locale.text('Rancher', 'Ganadero') }}</strong></div>
         <div class="summary-row"><span>{{ locale.text('Herd size', 'Tamaño del hato') }}</span><strong>{{ headCount() ?? '—' }}</strong></div>
@@ -93,12 +93,12 @@
         <div class="summary-row summary-device-limit"><span>{{ locale.text('Device limit', 'Límite de dispositivos') }}</span><strong>{{ deviceLimitLabel() }}</strong></div>
         @if (estimate(); as quote) {
           <div class="summary-total">
-            <span>{{ locale.text('Illustrative annual estimate', 'Estimación anual ilustrativa') }}</span>
+            <span>{{ locale.text('Annual estimate', 'Estimación anual') }}</span>
             <strong>S/ {{ locale.number(quote.annualAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</strong>
           </div>
         }
       }
-      <p class="text-muted summary-note">{{ locale.text('Rates and labels are provisional mockup examples. Tax treatment and final commercial terms are not specified in the report.', 'Las tarifas y etiquetas son ejemplos provisionales del mockup. El informe no especifica impuestos ni condiciones comerciales definitivas.') }}</p>
+      <p class="text-muted summary-note">{{ locale.text('Confirm final rates, taxes and commercial terms before contracting a plan.', 'Confirma las tarifas finales, los impuestos y las condiciones comerciales antes de contratar un plan.') }}</p>
     </div>
   </aside>
 </div>
