@@ -19,7 +19,7 @@ h1 { margin: 12px 0; color: var(--iam-forest); }
 .auth-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(17,33,22,.88)); }
 figcaption { position: absolute; z-index: 1; bottom: 36px; left: 36px; right: 36px; color: #fff; }
 figcaption span { color: #f4d677; font-size: .72rem; letter-spacing: .1em; }
-figcaption strong { display: block; font: 600 1.9rem/1.2 'Outfit', sans-serif; max-width: 420px; margin-top: 14px; }
+figcaption strong { display: block; font: 600 1.9rem/1.2 var(--font-heading); max-width: 420px; margin-top: 14px; }
 figcaption p { font-size: .88rem; max-width: 370px; }
 .credential-demo { margin-top: 24px; border-top: 1px solid var(--iam-border); }
 summary { padding: 12px 0; min-height: 44px; cursor: pointer; font-size: .85rem; color: var(--iam-forest); }
@@ -53,4 +53,3 @@ summary { padding: 12px 0; min-height: 44px; cursor: pointer; font-size: .85rem;
   figcaption { bottom: 24px; left: 24px; right: 24px; }
   figcaption strong { font-size: 1.55rem; }
 }
-
