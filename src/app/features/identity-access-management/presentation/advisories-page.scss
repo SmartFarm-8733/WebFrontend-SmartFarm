@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.page-lead strong { color: var(--forest, #33513e); }
+.advisory-table-scroll { min-width: 0; }
+.advisory-table { min-width: 760px; }
+.advisory-name, .advisory-table tbody th .text-muted { display: block; }
+.advisory-table tbody th .text-muted { margin-top: 4px; font-size: .8rem; }
+.advisory-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.advisory-actions .btn { min-height: 44px; }
+.advisory-footnote { margin: 18px 0 0; }
+
+@media (max-width: 420px) {
+  .panel-head { align-items: flex-start; }
+}
