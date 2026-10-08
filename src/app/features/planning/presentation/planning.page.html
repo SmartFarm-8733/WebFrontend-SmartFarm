@@ -1,0 +1,409 @@
+<section class="planning-page" aria-labelledby="planning-title">
+  <header class="page-heading planning-heading">
+    <div>
+      <span class="eyebrow">{{ locale.text('Herd health · planning', 'Sanidad del hato · planificación') }}</span>
+      <h1 id="planning-title">{{ locale.text('Health planning', 'Planificación sanitaria') }}</h1>
+      <p class="page-lead">{{ locale.text('Schedule herd care, follow application progress and keep upcoming reviews in view.', 'Programa la atención del hato, revisa el avance de las aplicaciones y mantén a la vista los seguimientos.') }}</p>
+    </div>
+    @if (planning.canEdit()) {
+      <button id="schedule-campaign" class="btn primary" type="button" (click)="openForm()">
+        {{ locale.text('Schedule campaign', 'Programar campaña') }}
+      </button>
+    }
+  </header>
+
+  @if (!planning.snapshot().authorized) {
+    <section class="notice access-notice" role="status" aria-live="polite">
+      <h2>{{ locale.text('Planning is unavailable for this herd', 'La planificación no está disponible para este hato') }}</h2>
+      <p>{{ locale.text('No planning records are available in this demo for the selected veterinary herd.', 'Esta demostración no ofrece registros de planificación para el hato veterinario seleccionado.') }}</p>
+    </section>
+  } @else {
+    @if (!planning.canEdit()) {
+      <section class="notice read-only-notice" role="status">
+        <h2>{{ locale.text('Veterinary view · read only', 'Vista veterinaria · solo lectura') }}</h2>
+        <p>{{ locale.text('You can review this authorized herd’s calendar and progress. Campaign changes and application records are reserved for the ranch manager.', 'Puedes consultar el calendario y el avance de este hato autorizado. La administración ganadera es quien programa campañas y registra aplicaciones.') }}</p>
+      </section>
+    }
+
+    @if (planning.notice()) {
+      <p class="notice result-notice" role="status" aria-live="polite">{{ noticeText() }}</p>
+    }
+    @if (planning.error(); as error) {
+      <p class="notice error-notice" role="alert">{{ errorText(error) }}</p>
+    }
+
+    <section class="stats-grid planning-stats" [attr.aria-label]="locale.text('Annual campaign summary', 'Resumen anual de campañas')">
+      <article class="stat">
+        <span class="stat-label">{{ locale.text('Campaigns this year', 'Campañas este año') }}</span>
+        <strong class="stat-value">{{ locale.number(planning.summary().campaigns) }}</strong>
+        <p class="stat-note">{{ locale.text('Scheduled health campaigns', 'Campañas sanitarias programadas') }}</p>
+      </article>
+      <article class="stat">
+        <span class="stat-label">{{ locale.text('Completed', 'Completadas') }}</span>
+        <strong class="stat-value">{{ locale.number(planning.summary().completed) }}</strong>
+        <p class="stat-note">{{ locale.text('Closed after all applications', 'Cerradas al registrar todas las aplicaciones') }}</p>
+      </article>
+      <article class="stat">
+        <span class="stat-label">{{ locale.text('Overdue', 'Vencidas') }}</span>
+        <strong class="stat-value">{{ locale.number(planning.summary().overdue) }}</strong>
+        <p class="stat-note">{{ locale.text('Campaigns still requiring attention', 'Campañas que aún requieren atención') }}</p>
+      </article>
+      <article class="stat featured">
+        <span class="stat-label">{{ locale.text('Application coverage', 'Avance de aplicaciones') }}</span>
+        <strong class="stat-value">{{ locale.number(planning.summary().coverage) }}%</strong>
+        <p class="stat-note">{{ locale.number(planning.summary().applied) }} / {{ locale.number(planning.summary().total) }} {{ locale.text('animals recorded', 'animales registrados') }}</p>
+      </article>
+    </section>
+
+    @if (planning.reminders().length > 0) {
+      <section class="panel reminder-panel" aria-labelledby="reminders-title">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">{{ locale.text('Needs attention', 'Requiere atención') }}</span>
+            <h2 id="reminders-title">{{ locale.text('Campaign reminders', 'Recordatorios de campañas') }}</h2>
+          </div>
+          <span class="badge warning">{{ locale.number(planning.reminders().length) }}</span>
+        </div>
+        <ul class="reminder-list">
+          @for (campaign of planning.reminders(); track campaign.id) {
+            <li class="reminder-item">
+              <div class="reminder-copy">
+                <h3>{{ name(campaign.name) }}</h3>
+                <p class="text-muted">
+                  {{ date(campaign.date) }} · {{ lotName(campaign.lotId) }} ·
+                  {{ locale.number(campaign.animalIds.length - campaign.applications.length) }}
+                  {{ locale.text('animals pending', 'animales pendientes') }}
+                </p>
+              </div>
+              @if (planning.canEdit()) {
+                <button class="btn secondary" type="button" (click)="planning.acknowledge(campaign.id)">
+                  {{ locale.text('Mark as read', 'Marcar como leído') }}
+                </button>
+              } @else {
+                <span class="badge neutral">{{ locale.text('Read only', 'Solo lectura') }}</span>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (showForm()) {
+      <section class="panel campaign-form-panel" aria-labelledby="campaign-form-title">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">{{ locale.text('New calendar entry', 'Nuevo registro del calendario') }}</span>
+            <h2 id="campaign-form-title">{{ locale.text('Schedule a health campaign', 'Programar una campaña sanitaria') }}</h2>
+          </div>
+          <button class="btn secondary" type="button" (click)="requestClose()">
+            {{ locale.text('Close form', 'Cerrar formulario') }}
+          </button>
+        </div>
+        <div class="panel-body">
+          @if (discardPending()) {
+            <div class="notice discard-notice" role="alert">
+              <p>{{ locale.text('This form has unsaved changes. Discard them?', 'El formulario tiene cambios sin guardar. ¿Quieres descartarlos?') }}</p>
+              <div class="inline-actions">
+                <button class="btn danger" type="button" (click)="closeForm()">{{ locale.text('Discard changes', 'Descartar cambios') }}</button>
+                <button class="btn secondary" type="button" (click)="discardPending.set(false)">{{ locale.text('Keep editing', 'Seguir editando') }}</button>
+              </div>
+            </div>
+          }
+
+          <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+            <div class="form-grid">
+              <label class="field" for="campaign-name">
+                <span>{{ locale.text('Campaign name', 'Nombre de la campaña') }}</span>
+                <input id="campaign-name" type="text" formControlName="name" maxlength="80" autocomplete="off"
+                  [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+                  [attr.aria-describedby]="form.controls.name.invalid && form.controls.name.touched ? 'campaign-name-error' : null">
+                @if (form.controls.name.invalid && form.controls.name.touched) {
+                  <span id="campaign-name-error" class="form-error">{{ errorText('name') }}</span>
+                }
+              </label>
+
+              <label class="field" for="campaign-lot">
+                <span>{{ locale.text('Lot', 'Lote') }}</span>
+                <select id="campaign-lot" formControlName="lotId"
+                  [attr.aria-invalid]="form.controls.lotId.invalid && form.controls.lotId.touched"
+                  [attr.aria-describedby]="form.controls.lotId.invalid && form.controls.lotId.touched ? 'campaign-lot-error' : null">
+                  <option value="">{{ locale.text('Select a lot', 'Selecciona un lote') }}</option>
+                  @for (lot of planning.snapshot().lots; track lot.id) {
+                    <option [value]="lot.id">{{ name(lot.name) }}</option>
+                  }
+                </select>
+                @if (form.controls.lotId.invalid && form.controls.lotId.touched) {
+                  <span id="campaign-lot-error" class="form-error">{{ errorText('lot') }}</span>
+                }
+              </label>
+
+              <label class="field" for="campaign-date">
+                <span>{{ locale.text('Campaign date', 'Fecha de la campaña') }}</span>
+                <input id="campaign-date" type="date" formControlName="date"
+                  [attr.aria-invalid]="form.controls.date.invalid && form.controls.date.touched"
+                  [attr.aria-describedby]="form.controls.date.invalid && form.controls.date.touched ? 'campaign-date-error' : null">
+                @if (form.controls.date.invalid && form.controls.date.touched) {
+                  <span id="campaign-date-error" class="form-error">{{ errorText('date') }}</span>
+                }
+              </label>
+
+              <label class="field" for="campaign-type">
+                <span>{{ locale.text('Care type', 'Tipo de atención') }}</span>
+                <select id="campaign-type" formControlName="type">
+                  @for (type of typeOptions; track type) {
+                    <option [value]="type">{{ typeName(type) }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="field" for="campaign-animal-count">
+                <span>{{ locale.text('Animals in this lot', 'Animales de este lote') }}</span>
+                <input id="campaign-animal-count" type="number" formControlName="animalCount" min="1" [max]="availableAnimals().length" step="1"
+                  [attr.aria-invalid]="form.controls.animalCount.invalid && form.controls.animalCount.touched"
+                  [attr.aria-describedby]="form.controls.animalCount.invalid && form.controls.animalCount.touched ? 'campaign-animal-count-error' : 'campaign-animal-count-help'">
+                <span id="campaign-animal-count-help" class="field-help">{{ locale.number(availableAnimals().length) }} {{ locale.text('active animals available', 'animales activos disponibles') }}</span>
+                @if (form.controls.animalCount.invalid && form.controls.animalCount.touched) {
+                  <span id="campaign-animal-count-error" class="form-error">{{ errorText('animals') }}</span>
+                }
+              </label>
+
+              <label class="field" for="campaign-lead-days">
+                <span>{{ locale.text('Reminder lead time', 'Anticipación del aviso') }}</span>
+                <span class="input-suffix">
+                  <input id="campaign-lead-days" type="number" formControlName="leadDays" min="0" max="30" step="1"
+                    [attr.aria-invalid]="form.controls.leadDays.invalid && form.controls.leadDays.touched"
+                    [attr.aria-describedby]="form.controls.leadDays.invalid && form.controls.leadDays.touched ? 'campaign-lead-days-error' : 'campaign-lead-days-help'">
+                  <span aria-hidden="true">{{ locale.text('days before', 'días antes') }}</span>
+                </span>
+                <span id="campaign-lead-days-help" class="field-help">{{ locale.text('Choose from 0 to 30 days.', 'Elige entre 0 y 30 días.') }}</span>
+                @if (form.controls.leadDays.invalid && form.controls.leadDays.touched) {
+                  <span id="campaign-lead-days-error" class="form-error">{{ errorText('reminder') }}</span>
+                }
+              </label>
+            </div>
+
+            @if (formOverlaps().length > 0) {
+              <aside class="notice withdrawal-warning" aria-labelledby="withdrawal-warning-title">
+                <h3 id="withdrawal-warning-title">{{ locale.text('Withdrawal period overlaps this date', 'Hay un periodo de retiro que coincide con esta fecha') }}</h3>
+                <p>{{ locale.text('Review these demo clinical records before applying treatment:', 'Revisa estos registros clínicos de demostración antes de aplicar el tratamiento:') }}</p>
+                <ul>
+                  @for (period of formOverlaps(); track period.animalId + period.start) {
+                    <li><span class="mono">{{ planning.animalTag(period.animalId) }}</span> · {{ name(period.product) }} · {{ date(period.start) }}–{{ date(period.end) }}</li>
+                  }
+                </ul>
+              </aside>
+            }
+
+            <div class="form-actions">
+              <button class="btn secondary" type="button" (click)="requestClose()">{{ locale.text('Cancel', 'Cancelar') }}</button>
+              <button class="btn primary" type="submit" [disabled]="!planning.canEdit()">{{ locale.text('Save campaign', 'Guardar campaña') }}</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    }
+
+    <section class="panel planning-panel" aria-labelledby="calendar-title">
+      <div class="panel-head planning-panel-head">
+        <div>
+          <span class="eyebrow">{{ locale.text('Campaigns and follow-ups', 'Campañas y seguimientos') }}</span>
+          <h2 id="calendar-title">{{ locale.text('Herd calendar', 'Calendario del hato') }}</h2>
+        </div>
+        <div class="view-switch" role="group" [attr.aria-label]="locale.text('Calendar display', 'Vista del calendario')">
+          <button type="button" [class.active]="planning.view() === 'calendar'" [attr.aria-pressed]="planning.view() === 'calendar'" (click)="planning.view.set('calendar')">
+            {{ locale.text('Calendar', 'Calendario') }}
+          </button>
+          <button type="button" [class.active]="planning.view() === 'agenda'" [attr.aria-pressed]="planning.view() === 'agenda'" (click)="planning.view.set('agenda')">
+            {{ locale.text('Agenda', 'Agenda') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-body planning-body">
+        <div class="toolbar planning-filters">
+          <label class="field search-field" for="planning-search">
+            <span>{{ locale.text('Search activities', 'Buscar actividades') }}</span>
+            <input id="planning-search" type="search" [value]="planning.query()" (input)="setQuery($event)"
+              [placeholder]="locale.text('Campaign, lot or animal tag', 'Campaña, lote o arete')"
+              aria-controls="planning-entries">
+          </label>
+          <label class="field status-field" for="planning-status">
+            <span>{{ locale.text('Status', 'Estado') }}</span>
+            <select id="planning-status" [value]="planning.status()" (change)="setStatus($event)" aria-controls="planning-entries">
+              @for (status of statusOptions; track status) {
+                <option [value]="status">{{ statusName(status) }}</option>
+              }
+            </select>
+          </label>
+          @if (planning.query() || planning.status() !== 'all') {
+            <button class="btn secondary clear-filters" type="button" (click)="planning.clearFilters()">
+              {{ locale.text('Clear filters', 'Limpiar filtros') }}
+            </button>
+          }
+        </div>
+
+        <div class="planning-layout" [class.agenda-mode]="planning.view() === 'agenda'">
+          @if (planning.view() === 'calendar') {
+            <section class="calendar-column" aria-labelledby="month-title">
+              <div class="calendar-navigation">
+                <button class="month-step" type="button" (click)="planning.moveMonth(-1)" [attr.aria-label]="locale.text('Previous month', 'Mes anterior')">
+                  <span aria-hidden="true">‹</span>
+                </button>
+                <h3 id="month-title" aria-live="polite">{{ monthTitle() }}</h3>
+                <button class="month-step" type="button" (click)="planning.moveMonth(1)" [attr.aria-label]="locale.text('Next month', 'Mes siguiente')">
+                  <span aria-hidden="true">›</span>
+                </button>
+              </div>
+
+              <div class="calendar-weekdays" aria-hidden="true">
+                @for (weekday of weekdays(); track $index) {
+                  <span>{{ weekday }}</span>
+                }
+              </div>
+              <ol class="calendar-grid" [attr.aria-label]="locale.text('Dates in this month', 'Fechas de este mes')">
+                @for (day of planning.calendarDays(); track day.date) {
+                  <li class="calendar-cell" [class.outside-month]="!day.currentMonth" [class.has-overdue]="day.overdue">
+                    <button class="calendar-day" type="button" [class.selected]="day.date === planning.selectedDay()"
+                      [attr.aria-label]="dayLabel(day.date, day.count)" [attr.aria-pressed]="day.date === planning.selectedDay()"
+                      [attr.aria-current]="day.date === planning.today ? 'date' : null"
+                      [attr.tabindex]="day.date === planning.selectedDay() ? 0 : -1"
+                      [attr.data-day]="day.date" (click)="planning.selectDay(day.date)" (keydown)="calendarKey($event, day.date)">
+                      <span class="date-number">{{ day.number }}</span>
+                      @if (day.count > 0) {
+                        <span class="activity-count">{{ locale.number(day.count) }}<span class="visually-hidden"> {{ locale.text('activities', 'actividades') }}</span></span>
+                      }
+                      @if (day.overdue) {
+                        <span class="overdue-marker" aria-hidden="true"></span>
+                      }
+                    </button>
+                  </li>
+                }
+              </ol>
+              <p class="calendar-key"><span class="overdue-marker" aria-hidden="true"></span>{{ locale.text('At least one overdue activity', 'Al menos una actividad vencida') }}</p>
+            </section>
+          }
+
+          <section class="planning-agenda" aria-labelledby="agenda-title">
+            <header class="agenda-heading">
+              <div>
+                <span class="eyebrow">{{ planning.view() === 'agenda' ? locale.text('Month overview', 'Resumen del mes') : locale.text('Selected day', 'Día seleccionado') }}</span>
+                <h3 id="agenda-title">{{ planning.view() === 'agenda' ? monthTitle() : date(planning.selectedDay()) }}</h3>
+              </div>
+              <span class="agenda-count">{{ locale.number(listEntries().length) }} {{ locale.text('activities', 'actividades') }}</span>
+            </header>
+
+            @if (listEntries().length > 0) {
+              <ol id="planning-entries" class="agenda-list">
+                @for (entry of listEntries(); track entry.kind + entry.record.id) {
+                  <li class="agenda-item" [class.overdue-item]="entry.status === 'overdue'">
+                    <div class="entry-date">
+                      <time [attr.datetime]="entry.record.date">{{ date(entry.record.date) }}</time>
+                      <span>{{ entry.kind === 'campaign' ? typeName(entry.record.type) : locale.text('Follow-up', 'Seguimiento') }}</span>
+                    </div>
+                    <div class="entry-content">
+                      <div class="entry-title-row">
+                        <h4>{{ name(entry.record.name) }}</h4>
+                        <span class="badge" [class.success]="statusClass(entry.status) === 'success'" [class.warning]="statusClass(entry.status) === 'warning'" [class.danger]="statusClass(entry.status) === 'danger'" [class.neutral]="statusClass(entry.status) === 'neutral'">
+                          {{ statusName(entry.status) }}
+                        </span>
+                      </div>
+                      <p class="entry-meta">
+                        {{ locale.text('Lot', 'Lote') }} {{ lotName(entry.record.lotId) }}
+                        @if (entry.kind === 'review') {
+                          · {{ locale.text('Animal', 'Animal') }} <span class="mono">{{ planning.animalTag(entry.record.animalId) }}</span>
+                        }
+                      </p>
+                      @if (entry.status === 'overdue') {
+                        <p class="delay-note">{{ locale.number(entry.delay) }} {{ locale.text('days overdue', 'días de atraso') }}</p>
+                      }
+                      @if (entry.kind === 'review' && entry.record.reason === 'animal-inactive') {
+                        <p class="text-muted">{{ locale.text('The animal is no longer active; this review does not apply.', 'El animal ya no está activo; este seguimiento no aplica.') }}</p>
+                      }
+                      @if (entry.kind === 'campaign') {
+                        <div class="entry-progress">
+                          <div class="progress-caption">
+                            <span>{{ locale.text('Applications', 'Aplicaciones') }}</span>
+                            <span>{{ locale.number(entry.record.applications.length) }} / {{ locale.number(entry.record.animalIds.length) }}</span>
+                          </div>
+                          <progress [value]="planning.progress(entry.record)" max="100" [attr.aria-label]="locale.text('Campaign application progress', 'Avance de aplicaciones de la campaña') + ': ' + planning.progress(entry.record) + '%'">{{ planning.progress(entry.record) }}%</progress>
+                        </div>
+                        @if (planning.overlaps(entry.record).length > 0) {
+                          <p class="withdrawal-inline">{{ locale.text('Withdrawal overlap', 'Coincide con un retiro') }} · {{ planning.overlaps(entry.record).length }}</p>
+                        }
+                        <button class="text-action" type="button" (click)="openApplications(entry.record)">
+                          {{ planning.canEdit() ? locale.text('Open campaign details', 'Abrir detalles de campaña') : locale.text('View campaign progress', 'Ver avance de campaña') }}
+                        </button>
+                      }
+                    </div>
+                  </li>
+                }
+              </ol>
+            } @else {
+              <div class="empty-state agenda-empty">
+                <h4>{{ locale.text('No activities here', 'No hay actividades aquí') }}</h4>
+                <p>{{ planning.query() || planning.status() !== 'all' ? locale.text('Try another search or clear the filters.', 'Prueba otra búsqueda o limpia los filtros.') : planning.view() === 'agenda' ? locale.text('There are no activities scheduled this month.', 'No hay actividades programadas este mes.') : locale.text('There are no activities scheduled for this day.', 'No hay actividades programadas para este día.') }}</p>
+                @if (planning.query() || planning.status() !== 'all') {
+                  <button class="btn secondary" type="button" (click)="planning.clearFilters()">{{ locale.text('Clear filters', 'Limpiar filtros') }}</button>
+                }
+              </div>
+            }
+          </section>
+        </div>
+
+        @if (activeCampaign(); as campaign) {
+          <section id="campaign-detail" class="campaign-detail" aria-labelledby="campaign-detail-title" tabindex="-1">
+            <div class="campaign-detail-heading">
+              <div>
+                <span class="eyebrow">{{ locale.text('Campaign record', 'Registro de campaña') }}</span>
+                <h3 id="campaign-detail-title">{{ name(campaign.name) }}</h3>
+                <p class="text-muted">{{ typeName(campaign.type) }} · {{ lotName(campaign.lotId) }} · {{ date(campaign.date) }}</p>
+              </div>
+              <span class="badge" [class.success]="campaign.status === 'completed'" [class.warning]="campaign.status === 'in-progress' && campaign.date >= planning.today" [class.danger]="campaign.status !== 'completed' && campaign.date < planning.today" [class.neutral]="campaign.status === 'scheduled' && campaign.date >= planning.today">
+                {{ statusName(campaign.status !== 'completed' && campaign.date < planning.today ? 'overdue' : campaign.status) }}
+              </span>
+            </div>
+
+            <div class="detail-progress">
+              <div class="progress-caption">
+                <span>{{ locale.text('Applications recorded', 'Aplicaciones registradas') }}</span>
+                <span>{{ locale.number(campaign.applications.length) }} / {{ locale.number(campaign.animalIds.length) }} · {{ locale.number(planning.progress(campaign)) }}%</span>
+              </div>
+              <progress [value]="planning.progress(campaign)" max="100" [attr.aria-label]="locale.text('Campaign application progress', 'Avance de aplicaciones de la campaña') + ': ' + planning.progress(campaign) + '%'">{{ planning.progress(campaign) }}%</progress>
+            </div>
+
+            @if (planning.overlaps(campaign).length > 0) {
+              <div class="notice withdrawal-warning detail-warning">
+                <h4>{{ locale.text('Withdrawal period overlaps this campaign', 'Hay un periodo de retiro que coincide con esta campaña') }}</h4>
+                <ul>
+                  @for (period of planning.overlaps(campaign); track period.animalId + period.start) {
+                    <li><span class="mono">{{ planning.animalTag(period.animalId) }}</span> · {{ name(period.product) }} · {{ date(period.start) }}–{{ date(period.end) }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (planning.canEdit() && campaign.status !== 'completed' && campaign.date <= planning.today) {
+              <form class="application-form" (ngSubmit)="recordApplication(campaign)">
+                <label class="field" for="campaign-animal">
+                  <span>{{ locale.text('Animal to record', 'Animal a registrar') }}</span>
+                  <select id="campaign-animal" [formControl]="applicationAnimal" [disabled]="pendingAnimals(campaign).length === 0">
+                    @for (animal of pendingAnimals(campaign); track animal.id) {
+                      <option [value]="animal.id">{{ animal.tag }}</option>
+                    }
+                  </select>
+                </label>
+                @if (pendingAnimals(campaign).length > 0) {
+                  <button class="btn primary" type="submit" [disabled]="applicationAnimal.invalid">{{ locale.text('Record application', 'Registrar aplicación') }}</button>
+                } @else {
+                  <p class="text-muted">{{ locale.text('Every animal in this campaign has been recorded.', 'Ya se registraron todos los animales de esta campaña.') }}</p>
+                }
+              </form>
+            } @else if (campaign.date > planning.today && campaign.status !== 'completed') {
+              <p class="application-guidance">{{ locale.text('Applications open on the campaign date.', 'Las aplicaciones se habilitan en la fecha de la campaña.') }}</p>
+            }
+          </section>
+        }
+      </div>
+    </section>
+  }
+</section>
