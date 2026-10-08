@@ -1,0 +1,27 @@
+<a class="skip-link" href="#workspace-content">{{ locale.text('Skip to content', 'Ir al contenido') }}</a>
+<div class="workspace">
+  @if (menuOpen()) { <button class="scrim" type="button" (click)="menuOpen.set(false)" [attr.aria-label]="locale.text('Close navigation', 'Cerrar navegación')"></button> }
+  <aside class="sidebar" id="workspace-nav" [class.open]="menuOpen()" [attr.aria-label]="locale.text('Workspace navigation', 'Navegación del espacio de trabajo')">
+    <a class="brand" routerLink="/dashboard" aria-label="ICHU · SmartFarm"><img src="/assets/images/ICHU_Principal_Transparente.png" alt="ICHU · SmartFarm" width="74" height="98"></a>
+    <nav>
+      @for (group of groups; track group.en) {
+        <div class="nav-group"><span class="nav-caption">{{ locale.text(group.en, group.es) }}</span>
+          @for (link of group.links; track link.path) {
+            <a [routerLink]="link.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" ariaCurrentWhenActive="page"><ichu-icon [name]="link.icon" /><span>{{ locale.text(link.en, link.es) }}</span></a>
+          }
+        </div>
+      }
+    </nav>
+    <div class="sidebar-note"><span class="badge warning">{{ locale.text('TB1 demonstration', 'Demostración TB1') }}</span><p>{{ locale.text('Sample data. No connected devices or real payments.', 'Datos de ejemplo. Sin dispositivos conectados ni pagos reales.') }}</p><a routerLink="/terms">{{ locale.text('Terms & privacy', 'Términos y privacidad') }}</a></div>
+  </aside>
+  <div class="workspace-main">
+    <header class="workspace-header">
+      <button class="menu-button" type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-label]="locale.text('Toggle navigation', 'Abrir o cerrar navegación')" [attr.aria-expanded]="menuOpen()" aria-controls="workspace-nav"><ichu-icon [name]="menuOpen() ? 'close' : 'menu'" /></button>
+      <div class="workspace-location"><span class="header-caption">{{ locale.text('Active herd', 'Hato activo') }}</span><label class="visually-hidden" for="herd">{{ locale.text('Select herd', 'Seleccionar hato') }}</label><select id="herd" [value]="workspace.herdId()" (change)="selectHerd($event)">@for (herd of workspace.herds; track herd.id) { <option [value]="herd.id">{{ herd.name }}</option> }</select></div>
+      <div class="header-controls"><label class="visually-hidden" for="workspace-role">{{ locale.text('Demo role', 'Rol de demostración') }}</label><select id="workspace-role" [value]="workspace.role()" (change)="selectRole($event)"><option value="rancher">{{ locale.text('Ranch manager', 'Administrador ganadero') }}</option><option value="veterinarian">{{ locale.text('Veterinarian', 'Veterinario') }}</option></select><label class="visually-hidden" for="locale">{{ locale.text('Language', 'Idioma') }}</label><select id="locale" [value]="locale.locale()" (change)="selectLocale($event)"><option value="en_US">EN</option><option value="es_419">ES</option></select><button class="sign-out" type="button" (click)="signOut()" [attr.aria-label]="locale.text('Leave demo', 'Salir de la demostración')"><ichu-icon name="logout" /></button></div>
+    </header>
+    <div class="demo-strip"><span class="demo-dot"></span>{{ locale.text('Demonstration workspace', 'Espacio de demostración') }}<span class="separator">/</span><span>{{ locale.date(workspace.now, {weekday: 'short', month:'short', day:'numeric', year:'numeric'}) }}</span></div>
+    <main id="workspace-content" tabindex="-1" class="workspace-content"><router-outlet /></main>
+    <footer class="workspace-footer"><span>ICHU <span class="text-muted">· SmartFarm</span></span><span>{{ locale.text('Roots that innovate.', 'Raíces que innovan.') }}</span></footer>
+  </div>
+</div>
