@@ -88,3 +88,7 @@ export class MockIdentityAdapter extends IdentityRepository {
   }
 }
 
+/** Local composition binding; all pages reuse the root-owned adapter. */
+export const IDENTITY_REPOSITORY_PROVIDER = {
+  provide: IdentityRepository, useExisting: MockIdentityAdapter,
+};
