@@ -76,4 +76,3 @@ export class AccountPage {
     this.discardedDraft.set(false);
   }
 }
-
