@@ -1,0 +1,369 @@
+<main class="devices-page">
+  <header class="page-heading devices-heading">
+    <div>
+      <p class="eyebrow">{{ locale.text('IoT asset management', 'Gestión de activos IoT') }}</p>
+      <h1>{{ locale.text('Devices', 'Dispositivos') }}</h1>
+      <p class="page-lead">
+        {{ locale.text('Review collars, water controllers and gateways, their assignments, battery and latest communication.',
+          'Revisa collares, controladores de agua y pasarelas, sus asignaciones, batería y última comunicación.') }}
+      </p>
+    </div>
+    <div class="herd-context">
+      <span class="text-muted">{{ locale.text('Current herd', 'Hato actual') }}</span>
+      <strong>{{ workspace.herdName() }}</strong>
+    </div>
+  </header>
+
+  @if (!facade.inventory().authorized) {
+    <section class="notice notice-danger" role="alert">
+      <h2>{{ locale.text('Herd access unavailable', 'Hato no disponible') }}</h2>
+      <p>{{ locale.text('Choose a herd you are authorized to view.', 'Elige un hato al que tengas acceso.') }}</p>
+    </section>
+  } @else {
+    <section class="stats-grid" aria-label="{{ locale.text('Device summary', 'Resumen de dispositivos') }}">
+      <article class="stat">
+        <span class="stat-label">{{ locale.text('Online', 'En línea') }}</span>
+        <strong class="stat-value">{{ locale.number(facade.stats().online) }}</strong>
+        <span class="stat-note">{{ locale.text('Communicated in the last 48 hours', 'Se comunicaron en las últimas 48 horas') }}</span>
+      </article>
+      <article class="stat">
+        <span class="stat-label">{{ locale.text('No connection', 'Sin conexión') }}</span>
+        <strong class="stat-value">{{ locale.number(facade.stats().offline) }}</strong>
+        <span class="stat-note">{{ locale.text('Reported offline or last seen over 48 hours ago', 'Sin conexión o última comunicación hace más de 48 horas') }}</span>
+      </article>
+      <article class="stat">
+        <span class="stat-label">{{ locale.text('Low battery', 'Batería baja') }}</span>
+        <strong class="stat-value">{{ locale.number(facade.stats().lowBattery) }}</strong>
+        <span class="stat-note">{{ locale.text('At or below 20%', 'Igual o por debajo de 20%') }}</span>
+      </article>
+      <article class="stat featured">
+        <span class="stat-label">{{ locale.text('Collars assigned', 'Collares asignados') }}</span>
+        <strong class="stat-value">
+          {{ locale.number(facade.inventory().plan.assigned) }}<span class="stat-total"> / {{ locale.number(facade.inventory().plan.limit) }}</span>
+        </strong>
+        <span class="stat-note">{{ locale.text('Demo plan allowance', 'Límite del plan de demo') }}</span>
+      </article>
+    </section>
+
+    @if (facade.readOnly()) {
+      <section class="notice notice-info" role="note">
+        <h2>{{ locale.text('Veterinary view · read only', 'Vista veterinaria · solo lectura') }}</h2>
+        <p>{{ locale.text('You can review device status and assignments for this authorized herd. Only the rancher can change assignments.',
+          'Puedes consultar el estado y las asignaciones de este hato autorizado. Solo el ganadero puede modificarlas.') }}</p>
+      </section>
+    }
+
+    @if (facade.message(); as message) {
+      <div class="notice" [class.notice-success]="message === 'linked' || message === 'released'" role="status" aria-live="polite">
+        {{ messageText(message) }}
+      </div>
+    }
+
+    <div class="devices-layout split-grid">
+      <section class="panel inventory-panel" aria-labelledby="inventory-heading">
+        <div class="panel-head inventory-head">
+          <div>
+            <h2 id="inventory-heading">{{ locale.text('Device inventory', 'Inventario de dispositivos') }}</h2>
+            <p class="text-muted">{{ locale.text('Search by device ID, animal or location.', 'Busca por identificador, animal o ubicación.') }}</p>
+          </div>
+          <span class="inventory-count mono">{{ locale.number(facade.inventory().devices.length) }}</span>
+        </div>
+
+        <div class="panel-body">
+          <form class="toolbar inventory-filters" [formGroup]="filtersForm" [attr.aria-label]="locale.text('Filter devices', 'Filtrar dispositivos')">
+            <div class="field search-field">
+              <label for="device-search">{{ locale.text('Search', 'Buscar') }}</label>
+              <input id="device-search" type="search" formControlName="identifier"
+                [placeholder]="locale.text('ID, animal or location', 'Identificador, animal o ubicación')" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="device-type-filter">{{ locale.text('Device type', 'Tipo de dispositivo') }}</label>
+              <select id="device-type-filter" formControlName="type">
+                <option value="all">{{ locale.text('All types', 'Todos los tipos') }}</option>
+                <option value="collar">{{ locale.text('Collars', 'Collares') }}</option>
+                <option value="water-controller">{{ locale.text('Water controllers', 'Controladores de agua') }}</option>
+                <option value="gateway">{{ locale.text('Gateways', 'Pasarelas') }}</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="connection-filter">{{ locale.text('Connection', 'Conexión') }}</label>
+              <select id="connection-filter" formControlName="connection">
+                <option value="all">{{ locale.text('All states', 'Todos los estados') }}</option>
+                <option value="online">{{ locale.text('Online', 'En línea') }}</option>
+                <option value="offline">{{ locale.text('No connection', 'Sin conexión') }}</option>
+                <option value="never-seen">{{ locale.text('Not yet seen', 'Sin comunicación inicial') }}</option>
+              </select>
+            </div>
+            <button class="btn secondary clear-filters" type="button" (click)="clearFilters()">
+              {{ locale.text('Clear filters', 'Limpiar filtros') }}
+            </button>
+          </form>
+
+          @if (facade.filtered().length > 0) {
+            <div class="table-scroll" role="region" tabindex="0" [attr.aria-label]="locale.text('Scrollable device inventory table', 'Tabla desplazable del inventario de dispositivos')">
+              <table class="data-table device-table">
+                <caption class="visually-hidden">{{ locale.text('Devices in', 'Dispositivos de') }} {{ workspace.herdName() }}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{{ locale.text('Device', 'Dispositivo') }}</th>
+                    <th scope="col">{{ locale.text('Assigned to / location', 'Asignado a / ubicación') }}</th>
+                    <th scope="col">{{ locale.text('Connection', 'Conexión') }}</th>
+                    <th scope="col">{{ locale.text('Latest reading', 'Última lectura') }}</th>
+                    <th scope="col">{{ locale.text('Battery', 'Batería') }}</th>
+                    <th scope="col">{{ locale.text('Last communication', 'Última comunicación') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (device of facade.filtered(); track device.id) {
+                    <tr [class.is-selected]="facade.selected()?.id === device.id">
+                      <td>
+                        <button class="device-select" type="button" (click)="facade.select(device.id)"
+                          [attr.aria-pressed]="facade.selected()?.id === device.id">
+                          <span class="mono">{{ device.id }}</span>
+                          <span class="device-type">{{ typeLabel(device.type) }}</span>
+                        </button>
+                      </td>
+                      <td>
+                        <span class="target-label">{{ targetLabel(device) }}</span>
+                      </td>
+                      <td>
+                        <span class="badge" [class.success]="connection(device) === 'online'"
+                          [class.warning]="connection(device) === 'offline'"
+                          [class.neutral]="connection(device) === 'never-seen'">
+                          {{ connectionLabel(device) }}
+                        </span>
+                        @if (device.pendingReadings !== null && device.pendingReadings > 0) {
+                          <span class="sub-label">{{ locale.number(device.pendingReadings) }} {{ locale.text('queued', 'pendientes') }}</span>
+                        }
+                      </td>
+                      <td>
+                        @if (device.type === 'collar' || device.type === 'water-controller') {
+                          {{ temperature(device.temperatureC) }}
+                        } @else {
+                          <span class="text-muted">{{ locale.text('No sensor reading', 'Sin lectura de sensor') }}</span>
+                        }
+                        @if (device.capturedAt !== null && stale(device)) {
+                          <span class="sub-label stale-label">{{ locale.text('Older capture', 'Captura antigua') }}</span>
+                        }
+                      </td>
+                      <td>
+                        @if (device.battery === null) {
+                          <span class="text-muted">{{ locale.text('Not available', 'No disponible') }}</span>
+                        } @else {
+                          <span [class.low-battery]="lowBattery(device)">{{ batteryLabel(device) }}</span>
+                        }
+                      </td>
+                      <td>{{ date(device.lastSeen) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="empty-state">
+              <h3>{{ locale.text('No matching devices', 'No hay dispositivos coincidentes') }}</h3>
+              <p>{{ locale.text('Try another identifier or clear one of the filters.', 'Prueba otro identificador o limpia alguno de los filtros.') }}</p>
+              <button class="btn secondary" type="button" (click)="clearFilters()">{{ locale.text('Clear filters', 'Limpiar filtros') }}</button>
+            </div>
+          }
+        </div>
+      </section>
+
+      <aside class="panel detail-panel" aria-labelledby="device-detail-heading" aria-live="polite">
+        @if (facade.selected(); as device) {
+          <div class="panel-head detail-head">
+            <div>
+              <p class="eyebrow">{{ locale.text('Selected device', 'Dispositivo seleccionado') }}</p>
+              <h2 id="device-detail-heading" class="mono">{{ device.id }}</h2>
+            </div>
+            <span class="badge device-kind">{{ typeLabel(device.type) }}</span>
+          </div>
+          <div class="panel-body stack detail-content">
+            <dl class="device-facts">
+              <div>
+                <dt>{{ locale.text('Firmware', 'Firmware') }}</dt>
+                <dd class="mono">{{ device.firmware }}</dd>
+              </div>
+              <div>
+                <dt>{{ locale.text('Connection', 'Conexión') }}</dt>
+                <dd>
+                  <span class="badge" [class.success]="connection(device) === 'online'"
+                    [class.warning]="connection(device) === 'offline'"
+                    [class.neutral]="connection(device) === 'never-seen'">{{ connectionLabel(device) }}</span>
+                </dd>
+              </div>
+              <div>
+                <dt>{{ locale.text('Last communication', 'Última comunicación') }}</dt>
+                <dd>{{ date(device.lastSeen) }}</dd>
+              </div>
+              <div>
+                <dt>{{ locale.text('Latest capture', 'Última captura') }}</dt>
+                <dd>
+                  {{ date(device.capturedAt) }}
+                  @if (device.capturedAt !== null && stale(device)) {
+                    <span class="badge warning">{{ locale.text('Older than 24 hours', 'Hace más de 24 horas') }}</span>
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt>{{ locale.text('Battery', 'Batería') }}</dt>
+                <dd>
+                  @if (device.battery === null) {
+                    {{ locale.text('Not available', 'No disponible') }}
+                  } @else {
+                    <span [class.low-battery]="lowBattery(device)">{{ batteryLabel(device) }}</span>
+                    @if (lowBattery(device)) { <span class="badge warning">{{ locale.text('Low', 'Baja') }}</span> }
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt>{{ locale.text('Latest reading', 'Última lectura') }}</dt>
+                <dd>
+                  @if (device.type === 'collar' || device.type === 'water-controller') {
+                    {{ temperature(device.temperatureC) }}
+                  } @else {
+                    {{ locale.text('No sensor reading', 'Sin lectura de sensor') }}
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt>{{ locale.text('Activity / device state', 'Actividad / estado del dispositivo') }}</dt>
+                <dd>
+                  @if (device.type === 'collar') {
+                    {{ device.activity ? localText(device.activity) : locale.text('No reading', 'Sin lectura') }}
+                  } @else if (device.type === 'water-controller') {
+                    @switch (device.heaterStatus) {
+                      @case ('on') { {{ locale.text('Heater on', 'Calentador encendido') }} }
+                      @case ('off') { {{ locale.text('Heater off', 'Calentador apagado') }} }
+                      @default { {{ locale.text('Status unknown', 'Estado desconocido') }} }
+                    }
+                  } @else {
+                    @if (device.bufferedReadings === null) {
+                      {{ locale.text('Buffer unavailable', 'Memoria no disponible') }}
+                    } @else {
+                      {{ locale.number(device.bufferedReadings) }} {{ locale.text('buffered readings', 'lecturas en memoria') }}
+                    }
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt>{{ locale.text('Assignment / location', 'Asignación / ubicación') }}</dt>
+                <dd>{{ targetLabel(device) }}</dd>
+              </div>
+            </dl>
+
+            @if (device.type === 'collar') {
+              <section class="assignment-section" aria-labelledby="assignment-heading">
+                <div class="section-heading">
+                  <h3 id="assignment-heading">{{ locale.text('Animal assignment', 'Asignación al animal') }}</h3>
+                  @if (device.assignment) {
+                    <span class="badge success">{{ locale.text('Assigned', 'Asignado') }}</span>
+                  } @else {
+                    <span class="badge neutral">{{ locale.text('Unassigned', 'Sin asignar') }}</span>
+                  }
+                </div>
+
+                @if (device.assignment) {
+                  <p class="assignment-target"><strong>{{ device.assignment.animal.earTag }}</strong>
+                    @if (device.assignment.animal.name) { <span> · {{ device.assignment.animal.name }}</span> }
+                  </p>
+                  <p class="text-muted">{{ locale.text('Assigned', 'Asignado') }} {{ date(device.assignment.startedAt) }}</p>
+                  @if (capturedBeforeAssignment(device)) {
+                    <p class="notice notice-warning assignment-note">
+                      {{ locale.text('The latest capture predates this assignment. Its capture time remains separate from the communication time.',
+                        'La última captura es anterior a esta asignación. Su hora se mantiene separada de la hora de comunicación.') }}
+                    </p>
+                  }
+
+                  @if (!facade.readOnly() && pendingRelease()?.id === device.id && pendingRelease()?.herdId === device.herdId) {
+                    <form class="assignment-form" [formGroup]="releaseForm" (ngSubmit)="confirmRelease(device)">
+                      <p>{{ locale.text('Confirm that you want to unassign this collar. The assignment will remain in its history.',
+                        'Confirma que deseas desvincular este collar. La asignación se conservará en el historial.') }}</p>
+                      <div class="field">
+                        <label for="release-reason">{{ locale.text('Reason for unassigning', 'Motivo de desvinculación') }}</label>
+                        <select id="release-reason" formControlName="reason" required
+                          [attr.aria-invalid]="releaseForm.controls.reason.touched && releaseForm.controls.reason.invalid"
+                          [attr.aria-describedby]="releaseForm.controls.reason.touched && releaseForm.controls.reason.invalid ? 'release-reason-error' : null">
+                          <option value="">{{ locale.text('Choose a reason', 'Elige un motivo') }}</option>
+                          <option value="maintenance">{{ locale.text('Maintenance', 'Mantenimiento') }}</option>
+                          <option value="animal-left-herd">{{ locale.text('Animal left the herd', 'Animal retirado del hato') }}</option>
+                          <option value="replacement">{{ locale.text('Replacement', 'Reemplazo') }}</option>
+                        </select>
+                        @if (releaseForm.controls.reason.touched && releaseForm.controls.reason.hasError('required')) {
+                          <span class="form-error" id="release-reason-error" role="alert">{{ locale.text('Choose a reason to continue.', 'Elige un motivo para continuar.') }}</span>
+                        }
+                      </div>
+                      <button class="btn danger" type="submit">{{ locale.text('Confirm unassignment', 'Confirmar desvinculación') }}</button>
+                    </form>
+                  }
+                  @if (!facade.readOnly()) {
+                    <button class="btn secondary unassign-button" type="button"
+                      (click)="pendingRelease()?.id === device.id ? pendingRelease.set(null) : requestRelease(device)">
+                      {{ pendingRelease()?.id === device.id
+                        ? locale.text('Cancel unassignment', 'Cancelar desvinculación')
+                        : locale.text('Unassign collar', 'Desvincular collar') }}
+                    </button>
+                  }
+                } @else {
+                  <p class="text-muted">{{ locale.text('No animal is currently assigned to this collar.', 'Este collar no tiene un animal asignado.') }}</p>
+                  @if (!facade.readOnly()) {
+                    <form class="assignment-form" [formGroup]="linkForm" (ngSubmit)="link(device)">
+                      <div class="field">
+                        <label for="assignment-animal">{{ locale.text('Select an animal', 'Selecciona un animal') }}</label>
+                        <select id="assignment-animal" formControlName="animalId" required
+                          [attr.aria-invalid]="linkForm.controls.animalId.touched && linkForm.controls.animalId.invalid"
+                          [attr.aria-describedby]="linkForm.controls.animalId.touched && linkForm.controls.animalId.invalid ? 'assignment-animal-error' : 'assignment-animal-help'">
+                          <option value="">{{ locale.text('Choose an available animal', 'Elige un animal disponible') }}</option>
+                          @for (animal of facade.availableAnimals(); track animal.id) {
+                            <option [value]="animal.id">{{ animal.earTag }}{{ animal.name ? ' · ' + animal.name : '' }}</option>
+                          }
+                        </select>
+                        @if (linkForm.controls.animalId.touched && linkForm.controls.animalId.hasError('required')) {
+                          <span class="form-error" id="assignment-animal-error" role="alert">{{ locale.text('Select an animal to continue.', 'Selecciona un animal para continuar.') }}</span>
+                        } @else {
+                          <span class="field-help" id="assignment-animal-help">
+                            {{ locale.text('Demo limit: ', 'Límite de demo: ') }}{{ locale.number(facade.inventory().plan.assigned) }} / {{ locale.number(facade.inventory().plan.limit) }}
+                          </span>
+                        }
+                      </div>
+                      @if (facade.availableAnimals().length === 0) {
+                        <p class="notice notice-warning">
+                          {{ locale.text('Every demo animal already has a collar. Unassign one before linking another.',
+                            'Todos los animales de demo ya tienen collar. Desvincula uno antes de asignar otro.') }}
+                        </p>
+                      }
+                      <button class="btn primary" type="submit" [disabled]="facade.availableAnimals().length === 0">
+                        {{ locale.text('Link collar', 'Vincular collar') }}
+                      </button>
+                    </form>
+                  }
+                }
+              </section>
+
+              @if (device.assignmentHistory.length > 0) {
+                <section class="history-section" aria-labelledby="assignment-history-heading">
+                  <h3 id="assignment-history-heading">{{ locale.text('Assignment history', 'Historial de asignaciones') }}</h3>
+                  <ol class="assignment-history">
+                    @for (assignment of device.assignmentHistory; track $index) {
+                      <li>
+                        <strong>{{ assignment.animal.earTag }}{{ assignment.animal.name ? ' · ' + assignment.animal.name : '' }}</strong>
+                        <span>{{ date(assignment.startedAt) }} – {{ date(assignment.endedAt) }}</span>
+                        <span class="text-muted">{{ reasonLabel(assignment.reason) }}</span>
+                      </li>
+                    }
+                  </ol>
+                </section>
+              }
+            }
+          </div>
+        } @else {
+          <div class="empty-state detail-empty">
+            <h2 id="device-detail-heading">{{ locale.text('Device details', 'Detalle del dispositivo') }}</h2>
+            <p>{{ locale.text('Select a device from the inventory to review its status and assignment.',
+              'Selecciona un dispositivo del inventario para consultar su estado y asignación.') }}</p>
+          </div>
+        }
+      </aside>
+    </div>
+  }
+</main>
