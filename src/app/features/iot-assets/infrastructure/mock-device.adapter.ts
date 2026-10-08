@@ -9,16 +9,17 @@ export const DEMO_DEVICE_CAP = 12;
 export const DEMO_AUTHORIZED_HERDS: readonly string[] = ['esperanza', 'pucara'];
 
 const ANIMALS: readonly KnownAnimal[] = [
-  { id: 'es-134', herdId: 'esperanza', earTag: 'ICH-134', name: 'Rocío' },
-  { id: 'es-014', herdId: 'esperanza', earTag: 'ICH-014', name: 'Napoleón' },
-  { id: 'es-089', herdId: 'esperanza', earTag: 'ICH-089', name: 'María' },
-  { id: 'es-077', herdId: 'esperanza', earTag: 'ICH-077', name: '' },
-  { id: 'es-095', herdId: 'esperanza', earTag: 'ICH-095', name: '' },
-  { id: 'es-201', herdId: 'esperanza', earTag: 'ICH-201', name: 'Luna' },
-  { id: 'es-063', herdId: 'esperanza', earTag: 'ICH-063', name: 'Blanca' },
-  { id: 'es-118', herdId: 'esperanza', earTag: 'ICH-118', name: 'Estrella' },
-  { id: 'pu-031', herdId: 'pucara', earTag: 'PUC-031', name: 'Lucero' },
-  { id: 'pu-044', herdId: 'pucara', earTag: 'PUC-044', name: 'Nieve' },
+  { id: 'lucero', herdId: 'esperanza', earTag: 'ICH-118', name: 'Lucero' },
+  { id: 'margarita', herdId: 'esperanza', earTag: 'ICH-104', name: 'Margarita' },
+  { id: 'canela', herdId: 'esperanza', earTag: 'ICH-126', name: 'Canela' },
+  { id: 'brisa', herdId: 'esperanza', earTag: 'ICH-132', name: 'Brisa' },
+  { id: 'toro', herdId: 'esperanza', earTag: 'ICH-109', name: 'Toro' },
+  { id: 'rocio', herdId: 'esperanza', earTag: 'ICH-134', name: 'Rocío' },
+  { id: 'maria', herdId: 'esperanza', earTag: 'ICH-089', name: 'María' },
+  { id: 'napoleon', herdId: 'esperanza', earTag: 'ICH-014', name: 'Napoleón' },
+  { id: 'alba', herdId: 'esperanza', earTag: 'ICH-201', name: 'Alba' },
+  { id: 'pucara-luna', herdId: 'pucara', earTag: 'ICH-118', name: 'Luna' },
+  { id: 'pucara-inti', herdId: 'pucara', earTag: 'ICH-210', name: 'Inti' },
 ];
 
 function collar(
@@ -38,14 +39,18 @@ function collar(
 
 function seedDevices(): IoTDevice[] {
   return [
-    collar('CL-0134', 'es-134', 78, 'online', '2026-10-08T10:28:00-05:00', '2026-10-08T10:28:12-05:00', 38.5),
-    collar('CL-0014', 'es-014', 64, 'online', '2026-10-08T10:26:00-05:00', '2026-10-08T10:26:07-05:00', 40.3),
-    collar('CL-0089', 'es-089', 91, 'offline', '2026-10-08T06:30:00-05:00', '2026-10-08T06:31:00-05:00', 38.1, 412),
-    collar('CL-0077', 'es-077', 12, 'online', '2026-10-08T10:29:00-05:00', '2026-10-08T10:29:05-05:00', 38.8),
+    collar('CL-0134', 'rocio', 78, 'online', '2026-10-08T10:28:00-05:00', '2026-10-08T10:28:12-05:00', 38.5),
+    collar('CL-0014', 'napoleon', 64, 'online', '2026-10-08T10:26:00-05:00', '2026-10-08T10:26:07-05:00', 40.3),
+    collar('CL-0089', 'maria', 91, 'offline', '2026-10-08T06:30:00-05:00', '2026-10-08T06:31:00-05:00', 38.1, 412),
+    collar('CL-0077', null, 12, 'online', '2026-10-08T10:29:00-05:00', '2026-10-08T10:29:05-05:00', 38.8),
     // A recent receipt does not make an old, buffered capture current.
-    collar('CL-0095', 'es-095', 8, 'online', '2026-10-06T01:30:00-05:00', '2026-10-08T10:20:00-05:00', null, 1090),
+    collar('CL-0095', null, 8, 'online', '2026-10-06T01:30:00-05:00', '2026-10-08T10:20:00-05:00', null, 1090),
+    collar('CL-0118', 'lucero', 76, 'online', '2026-10-08T10:27:00-05:00', '2026-10-08T10:27:08-05:00', 38.4),
+    collar('CL-0104', 'margarita', 82, 'online', '2026-10-08T10:25:00-05:00', '2026-10-08T10:25:07-05:00', 38.2),
+    collar('CL-0132', 'brisa', 12, 'offline', '2026-10-08T06:20:00-05:00', '2026-10-08T06:22:00-05:00', 38.8),
+    collar('CL-0109', 'toro', 64, 'online', '2026-10-08T10:26:00-05:00', '2026-10-08T10:26:07-05:00', 38.6),
     collar('CL-0021', null, null, 'never-seen', null, null, null),
-    collar('CL-0007', 'es-201', 0, 'offline', '2026-10-05T08:00:00-05:00', '2026-10-05T08:01:00-05:00', 37.9),
+    collar('CL-0007', null, 0, 'offline', '2026-10-05T08:00:00-05:00', '2026-10-05T08:01:00-05:00', 37.9),
     {
       id: 'WT-0001', herdId: 'esperanza', type: 'water-controller', connection: 'online', battery: null,
       capturedAt: '2026-10-08T10:25:00-05:00', lastSeen: '2026-10-08T10:25:08-05:00',
@@ -57,7 +62,8 @@ function seedDevices(): IoTDevice[] {
       capturedAt: '2026-10-08T10:27:00-05:00', lastSeen: '2026-10-08T10:27:10-05:00',
       firmware: '1.8.2', pendingReadings: 0, location: { en: 'Main pasture', es: 'Potrero principal' }, bufferedReadings: 216,
     },
-    collar('CL-0301', 'pu-031', 53, 'offline', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
+    collar('CL-0118', 'pucara-luna', 53, 'online', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
+    collar('CL-0301', null, 53, 'offline', '2026-10-08T08:10:00-05:00', '2026-10-08T08:10:05-05:00', 38.4, 72, 'pucara'),
     collar('CL-0302', null, null, 'never-seen', null, null, null, 0, 'pucara'),
     {
       id: 'WT-0002', herdId: 'pucara', type: 'water-controller', connection: 'never-seen', battery: null,
