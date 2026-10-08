@@ -122,14 +122,19 @@ test('limits withdrawal overlaps to the selected herd, animal and date range', (
     destination: 'unknown',
     source: 'demo-clinical-record',
   };
+  const pucaraWithdrawal: WithdrawalPeriod = {
+    ...luceroWithdrawal,
+    herdId: 'pucara',
+    animalId: 'pucara-ICH118',
+  };
   const periods: WithdrawalPeriod[] = [
     luceroWithdrawal,
-    { ...luceroWithdrawal, herdId: 'pucara', animalId: 'pucara-ICH118' },
+    pucaraWithdrawal,
     { ...luceroWithdrawal, source: 'unknown' },
   ];
 
   expect(withdrawalOverlaps('esperanza', ['esperanza-ICH118', 'pucara-ICH118'], '2026-10-06', periods)).toEqual([luceroWithdrawal]);
   expect(withdrawalOverlaps('esperanza', ['esperanza-ICH118'], '2026-10-12', periods)).toEqual([luceroWithdrawal]);
   expect(withdrawalOverlaps('esperanza', ['esperanza-ICH118'], '2026-10-13', periods)).toEqual([]);
-  expect(withdrawalOverlaps('pucara', ['pucara-ICH118'], '2026-10-08', periods)).toEqual([]);
+  expect(withdrawalOverlaps('pucara', ['pucara-ICH118'], '2026-10-08', periods)).toEqual([pucaraWithdrawal]);
 });
