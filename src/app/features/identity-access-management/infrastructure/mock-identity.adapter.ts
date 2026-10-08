@@ -34,7 +34,7 @@ export class MockIdentityAdapter extends IdentityRepository {
       herdId, role, name: role === 'rancher' ? 'Próspero Contreras' : 'Daniela Carbajal',
       email: role === 'rancher' ? 'prospero@example.com' : 'daniela@example.com',
       region: herdId === 'pucara' ? 'Puno' : 'Junín',
-      specialty: role === 'veterinarian' ? 'Herd health' : '',
+      specialty: role === 'veterinarian' ? 'herd-health' : '',
       license: role === 'veterinarian' ? 'CMVP-10428' : '',
       experience: role === 'veterinarian' ? 8 : 0,
     };
