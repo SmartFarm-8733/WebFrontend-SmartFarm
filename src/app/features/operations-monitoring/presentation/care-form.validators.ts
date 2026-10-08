@@ -1,12 +1,12 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { validDay } from '../domain/operations.models';
 
-export function calendarDayValidator(maximumDay: string): ValidatorFn {
+export function calendarDayValidator(maximumDay?: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = typeof control.value === 'string' ? control.value : '';
     if (!value) return null;
     if (!validDay(value)) return { calendarDay: true };
-    return value > maximumDay ? { futureDay: true } : null;
+    return maximumDay && value > maximumDay ? { futureDay: true } : null;
   };
 }
 
