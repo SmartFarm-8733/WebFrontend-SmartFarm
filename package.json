@@ -17,7 +17,9 @@
     "build:compat": "ng run smartfarm-web:build-compat",
     "start:compat": "ng run smartfarm-web:serve-compat",
     "typecheck": "ngc -p tsconfig.check.json --noEmit",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "preview": "node scripts/preview.mjs",
+    "preview:compat": "node scripts/preview.mjs --compat"
   },
   "dependencies": {
     "@angular/cdk": "22.2.2",
