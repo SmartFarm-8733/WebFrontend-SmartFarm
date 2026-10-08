@@ -56,7 +56,7 @@ export interface ScheduleCampaign {
   readonly animalCount: number;
   readonly leadDays: number;
 }
-export type PlanningError = 'forbidden' | 'name' | 'lot' | 'date' | 'animals' | 'reminder' | 'missing' | 'duplicate' | 'future' | 'completed';
+export type PlanningError = 'forbidden' | 'name' | 'lot' | 'date' | 'timestamp' | 'animals' | 'reminder' | 'missing' | 'duplicate' | 'future' | 'completed';
 export type PlanningResult = { readonly ok: true; readonly id: string } | { readonly ok: false; readonly error: PlanningError };
 
 /** Date-only values use UTC arithmetic; display uses the supplied locale separately. */
@@ -66,7 +66,14 @@ export function dateValue(value: string): number {
   return Number.isFinite(parsed) && new Date(parsed).toISOString().slice(0, 10) === value ? parsed : Number.NaN;
 }
 export function shiftDate(value: string, days: number): string {
-  return new Date(dateValue(value) + days * 86_400_000).toISOString().slice(0, 10);
+  const start = dateValue(value);
+  if (!Number.isFinite(start)) throw new RangeError('Invalid date-only value');
+  if (!Number.isInteger(days)) throw new RangeError('Day offset must be an integer');
+  const shifted = new Date(start + days * 86_400_000);
+  if (!Number.isFinite(shifted.getTime())) throw new RangeError('Shifted date is outside the supported range');
+  const result = shifted.toISOString().slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(result)) throw new RangeError('Shifted date is outside the supported range');
+  return result;
 }
 export function daysLate(date: string, today: string): number {
   return Math.max(0, Math.floor((dateValue(today) - dateValue(date)) / 86_400_000));
@@ -94,7 +101,23 @@ export function validateCampaign(input: ScheduleCampaign, lots: readonly Plannin
   if (!Number.isInteger(input.leadDays) || input.leadDays < 0 || input.leadDays > 30) return 'reminder';
   return undefined;
 }
+function instantValue(value: string): number {
+  const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|([+-])(\d{2}):(\d{2}))$/.exec(value);
+  if (!match || !Number.isFinite(dateValue(match[1]))) return Number.NaN;
+  const hours = Number(match[2]);
+  const minutes = Number(match[3]);
+  const seconds = Number(match[4]);
+  if (hours > 23 || minutes > 59 || seconds > 59) return Number.NaN;
+  if (match[5] !== 'Z') {
+    const offsetHours = Number(match[7]);
+    const offsetMinutes = Number(match[8]);
+    if (offsetHours > 14 || offsetMinutes > 59 || (offsetHours === 14 && offsetMinutes !== 0)) return Number.NaN;
+  }
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : Number.NaN;
+}
 export function registerCampaignApplication(campaign: HealthCampaign, animalId: string, at: string): HealthCampaign | PlanningError {
+  if (!Number.isFinite(instantValue(at))) return 'timestamp';
   if (campaign.status === 'completed') return 'completed';
   if (campaign.date > at.slice(0, 10)) return 'future';
   if (!campaign.animalIds.includes(animalId)) return 'animals';

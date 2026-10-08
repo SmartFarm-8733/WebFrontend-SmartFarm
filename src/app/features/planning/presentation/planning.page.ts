@@ -70,7 +70,8 @@ export class PlanningPage {
     const labels: Record<PlanningError, readonly [string, string]> = {
       forbidden: ['Only the ranch manager can change this calendar.', 'Solo el administrador ganadero puede cambiar este calendario.'],
       name: ['Enter a name of up to 80 characters.', 'Ingresa un nombre de hasta 80 caracteres.'], lot: ['Choose an available lot.', 'Selecciona un lote disponible.'],
-      date: ['Choose today or a later date.', 'Selecciona hoy o una fecha posterior.'], animals: ['Choose a whole number within the active lot size.', 'Elige un número entero dentro del tamaño del lote activo.'],
+      date: ['Choose today or a later date.', 'Selecciona hoy o una fecha posterior.'], timestamp: ['The application time is invalid. Try again.', 'La hora de la aplicación no es válida. Inténtalo de nuevo.'],
+      animals: ['Choose a whole number within the active lot size.', 'Elige un número entero dentro del tamaño del lote activo.'],
       reminder: ['Choose a reminder from 0 to 30 days before.', 'Elige un aviso de 0 a 30 días antes.'], missing: ['This record is unavailable. Select it again.', 'Este registro no está disponible. Selecciónalo de nuevo.'],
       duplicate: ['This animal already has an application recorded.', 'Este animal ya tiene una aplicación registrada.'], future: ['Applications open on the campaign date.', 'Las aplicaciones se habilitan en la fecha de la campaña.'], completed: ['This campaign is already complete.', 'Esta campaña ya está completa.'],
     };
