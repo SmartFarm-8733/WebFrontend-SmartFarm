@@ -1,0 +1,109 @@
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">{{ locale.text('REPRODUCTIVE RECORDS / ICHU', 'REGISTROS REPRODUCTIVOS / ICHU') }}</span>
+    <h1>{{ locale.text('Reproduction', 'Reproducción') }}</h1>
+    <p class="page-lead">{{ facade.workspace.herdName() }} · {{ locale.text('Field observations and service records in one herd timeline', 'Observaciones de campo y servicios en una cronología del hato') }}</p>
+  </div>
+  <span class="badge neutral">{{ locale.text('Demo records · no pregnancy status', 'Registros de demo · sin estado de gestación') }}</span>
+</header>
+
+<section class="stats-grid" [attr.aria-label]="locale.text('Reproductive record overview', 'Resumen de registros reproductivos')">
+  <div class="stat featured"><span class="stat-label">{{ locale.text('Possible heat reports', 'Reportes de posible celo') }}</span><strong class="stat-value">{{ locale.number(heatCount()) }}</strong><span class="stat-note">{{ locale.text('Unconfirmed field observations', 'Observaciones de campo sin confirmar') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Service records', 'Registros de servicio') }}</span><strong class="stat-value">{{ locale.number(serviceCount()) }}</strong><span class="stat-note">{{ locale.text('Recorded in this herd demo', 'Registrados en esta demo del hato') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Calving observations', 'Observaciones de parto') }}</span><strong class="stat-value">{{ locale.number(calvingCount()) }}</strong><span class="stat-note">{{ locale.text('No delivery prediction is modeled', 'No se modela una predicción de parto') }}</span></div>
+</section>
+
+<p class="notice reproduction-guidance">
+  @if (facade.workspace.role() === 'veterinarian') {
+    {{ locale.text('A service entry does not confirm conception. Pregnancy assessment and clinical decisions remain with the veterinarian.', 'Un registro de servicio no confirma la concepción. La evaluación de gestación y las decisiones clínicas corresponden al veterinario.') }}
+  } @else {
+    {{ locale.text('Field observations can document possible heat or calving. They do not confirm reproductive status.', 'Las observaciones de campo pueden documentar posible celo o parto. No confirman el estado reproductivo.') }}
+  }
+</p>
+
+@if (facade.feedback(); as feedback) {
+  <p class="notice record-feedback" [class.feedback-error]="feedbackIsError()" [attr.role]="feedbackIsError() ? 'alert' : 'status'" aria-live="polite">{{ facade.copy(feedback) }}</p>
+}
+
+<div class="split-grid reproduction-layout">
+  <section class="panel" aria-labelledby="reproduction-entry-title">
+    <div class="panel-head"><div><h2 id="reproduction-entry-title">{{ locale.text('Record a reproductive event', 'Registrar un evento reproductivo') }}</h2><p class="text-muted">{{ locale.text('Available record types follow the selected demo role.', 'Los tipos disponibles dependen del rol de demo seleccionado.') }}</p></div></div>
+    <div class="panel-body">
+      <form class="reproduction-form" [formGroup]="recordForm" (ngSubmit)="saveRecord()" novalidate>
+        <div class="field">
+          <label for="reproduction-animal">{{ locale.text('Animal', 'Animal') }}</label>
+          <select id="reproduction-animal" formControlName="animalId" required [attr.aria-invalid]="recordForm.controls.animalId.invalid && recordForm.controls.animalId.touched ? 'true' : null">
+            <option value="">{{ locale.text('Select an animal', 'Selecciona un animal') }}</option>
+            @for (animal of facade.animals(); track animal.id) { <option [value]="animal.id">{{ animal.id }} · {{ animal.name }}</option> }
+          </select>
+          @if (recordForm.controls.animalId.invalid && recordForm.controls.animalId.touched) { <span class="form-error" role="alert">{{ locale.text('Select an animal from this herd.', 'Selecciona un animal de este hato.') }}</span> }
+        </div>
+
+        <div class="field">
+          <label for="reproduction-kind">{{ locale.text('Record type', 'Tipo de registro') }}</label>
+          <select id="reproduction-kind" formControlName="kind">
+            @for (kind of availableKinds(); track kind) { <option [value]="kind">{{ facade.kindLabel(kind) }}</option> }
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="reproduction-date">{{ locale.text('Date of event', 'Fecha del evento') }}</label>
+          <input id="reproduction-date" type="date" formControlName="occurredAt" [max]="maximumDay" required [attr.aria-invalid]="recordForm.controls.occurredAt.invalid && recordForm.controls.occurredAt.touched ? 'true' : null" />
+          @if (recordForm.controls.occurredAt.hasError('calendarDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a real calendar date.', 'Escribe una fecha de calendario válida.') }}</span> }
+          @if (recordForm.controls.occurredAt.hasError('futureDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('The date cannot be after the demo date.', 'La fecha no puede ser posterior a la fecha de demo.') }}</span> }
+        </div>
+
+        <div class="field">
+          <label for="reproduction-note">{{ locale.text('Observation or service note', 'Observación o nota de servicio') }}</label>
+          <textarea id="reproduction-note" formControlName="note" rows="4" minlength="5" maxlength="500" required [attr.aria-invalid]="recordForm.controls.note.invalid && recordForm.controls.note.touched ? 'true' : null" [attr.aria-describedby]="recordForm.controls.note.invalid && recordForm.controls.note.touched ? 'reproduction-note-hint reproduction-note-error' : 'reproduction-note-hint'"></textarea>
+          <span id="reproduction-note-hint" class="text-muted">{{ locale.text('5–500 characters. Keep observations factual.', 'De 5 a 500 caracteres. Describe observaciones concretas.') }}</span>
+          @if (recordForm.controls.note.invalid && recordForm.controls.note.touched) { <span id="reproduction-note-error" class="form-error" role="alert">{{ locale.text('Enter a note between 5 and 500 characters.', 'Escribe una nota de 5 a 500 caracteres.') }}</span> }
+        </div>
+
+        <button class="btn primary save-record" type="submit">{{ locale.text('Save demo record', 'Guardar registro de demo') }}</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="reproduction-history-title">
+    <div class="panel-head"><div><h2 id="reproduction-history-title">{{ locale.text('Reproductive history', 'Historial reproductivo') }}</h2><p class="text-muted">{{ locale.text('Shown by event date; no gestation or conception status is fabricated.', 'Ordenado por fecha del evento; no se inventa un estado de gestación o concepción.') }}</p></div></div>
+    <form class="toolbar history-filters" [formGroup]="filters" [attr.aria-label]="locale.text('Filter reproductive history', 'Filtrar historial reproductivo')">
+      <div class="field">
+        <label for="reproduction-filter-animal">{{ locale.text('Animal', 'Animal') }}</label>
+        <select id="reproduction-filter-animal" formControlName="animal">
+          <option value="">{{ locale.text('All animals', 'Todos los animales') }}</option>
+          @for (animal of facade.animals(); track animal.id) { <option [value]="animal.id">{{ animal.id }} · {{ animal.name }}</option> }
+        </select>
+      </div>
+      <div class="field">
+        <label for="reproduction-filter-kind">{{ locale.text('Record type', 'Tipo de registro') }}</label>
+        <select id="reproduction-filter-kind" formControlName="kind">
+          <option value="">{{ locale.text('All record types', 'Todos los tipos') }}</option>
+          <option value="heat">{{ facade.kindLabel('heat') }}</option>
+          <option value="service">{{ facade.kindLabel('service') }}</option>
+          <option value="calving">{{ facade.kindLabel('calving') }}</option>
+        </select>
+      </div>
+      <button class="btn secondary" type="button" (click)="clearFilters()">{{ locale.text('Clear filters', 'Limpiar filtros') }}</button>
+    </form>
+
+    <div class="panel-body">
+      <ol class="reproductive-record-list">
+        @for (record of records(); track record.id) {
+          <li>
+            <article class="reproductive-record">
+              <header class="record-heading">
+                <div><span class="badge neutral">{{ facade.kindLabel(record.kind) }}</span><h3><span class="mono">{{ record.animalId }}</span> · {{ animalName(record.animalId) }}</h3></div>
+                <time [attr.datetime]="record.occurredAt">{{ facade.captured(record.occurredAt) }}</time>
+              </header>
+              <p class="record-note">{{ facade.copy(record.note) }}</p>
+              <p class="record-author text-muted">{{ facade.author(record.author) }}</p>
+            </article>
+          </li>
+        } @empty {
+          <li class="empty-state" role="status">{{ locale.text('No reproductive records match. Clear filters or select another animal.', 'No hay registros reproductivos coincidentes. Limpia los filtros o elige otro animal.') }}</li>
+        }
+      </ol>
+    </div>
+  </section>
+</div>
