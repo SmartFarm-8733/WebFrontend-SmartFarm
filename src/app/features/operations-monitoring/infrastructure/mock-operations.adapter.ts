@@ -4,9 +4,14 @@ import { AlertStatus, AnimalReading, CareRecordInput, CLINICAL_KINDS, EMPTY_OPER
 
 function seed(herdId: string): OperationsSnapshot {
   const pucara = herdId === 'pucara';
-  const ids = pucara ? ['ICH-201', 'ICH-207', 'ICH-218', 'ICH-242'] : ['ICH-014', 'ICH-077', 'ICH-118', 'ICH-142'];
-  const animals: AnimalReading[] = ids.map((id, index) => ({
-    id, herdId, name: ['Napoleón', 'Estrella', 'Lucero', 'Alba'][index],
+  const profiles = pucara
+    ? [{ id: 'ICH-118', name: 'Luna' }, { id: 'ICH-210', name: 'Inti' }]
+    : [{ id: 'ICH-014', name: 'Napoleón' }, { id: 'ICH-089', name: 'María' }, { id: 'ICH-118', name: 'Lucero' }, { id: 'ICH-201', name: 'Alba' }];
+  const ids = profiles.map((animal) => animal.id);
+  const clinicalAnimalId = ids[pucara ? 0 : 2];
+  const fieldAnimalId = ids[pucara ? 1 : 3];
+  const animals: AnimalReading[] = profiles.map(({ id, name }, index) => ({
+    id, herdId, name,
     lot: index === 0 ? { en: 'Breeding lot', es: 'Lote reproductores' } : { en: 'Lot 05 · pasture', es: 'Lote 05 · pastoreo' },
     temperature: [40.3, 38.8, 38.4, null][index], rumination: [290, 240, 410, null][index], activity: [24, 12, 48, null][index],
     capturedAt: index === 3 ? null : index === 1 ? '2026-10-08T08:10:00-05:00' : '2026-10-08T10:20:00-05:00',
@@ -22,10 +27,10 @@ function seed(herdId: string): OperationsSnapshot {
       { id: `${herdId}-activity`, herdId, animalId: ids[1], priority: 'medium', category: 'activity', title: { en: 'Reduced activity reported', es: 'Actividad reducida reportada' }, detail: { en: 'Sample activity signal. No recent readings are available.', es: 'Señal de actividad de muestra. No hay lecturas recientes disponibles.' }, raisedAt: '2026-10-08T08:10:00-05:00', status: 'acknowledged', acknowledgedAt: '2026-10-08T09:00:00-05:00', resolvedAt: null, responseNote: pucara ? 'Field visit requested · Pucará' : 'Field visit requested · La Esperanza', author: 'Demo rancher' },
     ],
     records: [
-      { id: `${herdId}-review`, herdId, animalId: ids[2], kind: 'review', occurredAt: '2026-10-08T09:20:00-05:00', note: { en: 'Follow-up recorded. Further assessment remains with the veterinarian.', es: 'Seguimiento registrado. La evaluación posterior corresponde al veterinario.' }, author: 'MVZ D. Carbajal · demo', product: '', dose: '', withdrawalStart: null, withdrawalEnd: null, withdrawalTarget: null },
-      { id: `${herdId}-treatment`, herdId, animalId: ids[2], kind: 'treatment', occurredAt: '2026-10-06T16:15:00-05:00', note: { en: 'Illustrative intervention and withdrawal dates; not a prescription.', es: 'Intervención y fechas de retiro ilustrativas; no es una receta.' }, author: 'MVZ D. Carbajal · demo', product: 'DEMO-P01', dose: 'Recorded dose · demo', withdrawalStart: '2026-10-06', withdrawalEnd: '2026-10-12', withdrawalTarget: 'both' },
-      { id: `${herdId}-heat`, herdId, animalId: ids[3], kind: 'heat', occurredAt: '2026-10-07T08:30:00-05:00', note: { en: 'Increased activity observed in the field. Heat is unconfirmed.', es: 'Mayor actividad observada en campo. Celo sin confirmar.' }, author: 'Demo rancher', product: '', dose: '', withdrawalStart: null, withdrawalEnd: null, withdrawalTarget: null },
-      { id: `${herdId}-service`, herdId, animalId: ids[2], kind: 'service', occurredAt: '2026-09-17T08:30:00-05:00', note: { en: 'Service entered by demo veterinarian. Pregnancy assessment pending.', es: 'Servicio registrado por veterinario de muestra. Evaluación de gestación pendiente.' }, author: 'MVZ D. Carbajal · demo', product: '', dose: '', withdrawalStart: null, withdrawalEnd: null, withdrawalTarget: null },
+      { id: `${herdId}-review`, herdId, animalId: clinicalAnimalId, kind: 'review', occurredAt: '2026-10-08T09:20:00-05:00', note: { en: 'Follow-up recorded. Further assessment remains with the veterinarian.', es: 'Seguimiento registrado. La evaluación posterior corresponde al veterinario.' }, author: 'MVZ D. Carbajal · demo', product: '', dose: '', withdrawalStart: null, withdrawalEnd: null, withdrawalTarget: null },
+      { id: `${herdId}-treatment`, herdId, animalId: clinicalAnimalId, kind: 'treatment', occurredAt: '2026-10-06T16:15:00-05:00', note: { en: 'Illustrative intervention and withdrawal dates; not a prescription.', es: 'Intervención y fechas de retiro ilustrativas; no es una receta.' }, author: 'MVZ D. Carbajal · demo', product: 'DEMO-P01', dose: 'Recorded dose · demo', withdrawalStart: '2026-10-06', withdrawalEnd: '2026-10-12', withdrawalTarget: 'both' },
+      { id: `${herdId}-heat`, herdId, animalId: fieldAnimalId, kind: 'heat', occurredAt: '2026-10-07T08:30:00-05:00', note: { en: 'Increased activity observed in the field. Heat is unconfirmed.', es: 'Mayor actividad observada en campo. Celo sin confirmar.' }, author: 'Demo rancher', product: '', dose: '', withdrawalStart: null, withdrawalEnd: null, withdrawalTarget: null },
+      { id: `${herdId}-service`, herdId, animalId: clinicalAnimalId, kind: 'service', occurredAt: '2026-09-17T08:30:00-05:00', note: { en: 'Service entered by demo veterinarian. Pregnancy assessment pending.', es: 'Servicio registrado por veterinario de muestra. Evaluación de gestación pendiente.' }, author: 'MVZ D. Carbajal · demo', product: '', dose: '', withdrawalStart: null, withdrawalEnd: null, withdrawalTarget: null },
     ],
     lots: [
       { id: `${herdId}-05`, herdId, name: { en: 'Lot 05 · finishing', es: 'Lote 05 · engorde' }, animals: pucara ? 18 : 24, pastureTonnes: pucara ? 12 : 18, pastureCapacity: 25, waterPercent: 84, waterTemperature: 18.2, heater: 'off', capturedAt: '2026-10-08T10:15:00-05:00', syncedAt: '2026-10-08T10:25:00-05:00', expectedWeight: 430, estimatedWeight: 438, cycleDay: 74, cycleDays: 90 },
