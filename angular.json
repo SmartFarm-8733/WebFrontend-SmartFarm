@@ -60,6 +60,24 @@
           },
           "defaultConfiguration": "production"
         },
+        "build-compat": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/smartfarm-web-compat",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "aot": true,
+            "assets": [{"glob": "**/*", "input": "public", "output": "/", "ignore": ["**/.gitkeep"]}],
+            "styles": ["src/styles.scss"],
+            "optimization": {"scripts": true, "styles": true, "fonts": false},
+            "outputHashing": "all"
+          }
+        },
+        "serve-compat": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {"buildTarget": "smartfarm-web:build-compat", "host": "127.0.0.1"}
+        },
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
