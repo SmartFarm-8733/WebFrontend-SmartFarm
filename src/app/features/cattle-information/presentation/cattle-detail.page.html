@@ -17,7 +17,7 @@
         [class.neutral]="animal.status === 'inactive'">{{ facade.statusLabel(animal) }}</span>
     </header>
 
-    <p class="demo-note">{{ locale.text('Sample record · Changes in this demo reset when the page is reloaded.', 'Ficha de ejemplo · Los cambios de esta demo se restablecen al recargar la página.') }}</p>
+    <p class="demo-note">{{ locale.text('Changes remain available for this session and reset when the page is reloaded.', 'Los cambios permanecen durante esta sesión y se restablecen al recargar la página.') }}</p>
 
     @if (saved(); as savedAction) {
       <p class="notice" role="status" aria-live="polite">
@@ -135,7 +135,7 @@
                   <dd><time [attr.datetime]="collar.lastSeen">{{ facade.date(collar.lastSeen) }}</time></dd>
                 </div>
               </dl>
-              <p class="text-muted collar-note">{{ locale.text('Connection status only. No live readings are included in this demo record.', 'Solo se muestra el estado de conexión. Esta ficha de demostración no incluye lecturas en vivo.') }}</p>
+              <p class="text-muted collar-note">{{ locale.text('Connection status only. Live readings are not available in this record.', 'Solo se muestra el estado de conexión. Esta ficha no incluye lecturas en vivo.') }}</p>
             } @else {
               <p><span class="badge neutral">{{ locale.text('No collar assigned', 'Sin collar asignado') }}</span></p>
               <p class="text-muted collar-note">{{ locale.text('Device assignment is managed separately from the animal record.', 'La asignación del dispositivo se gestiona por separado de la ficha del animal.') }}</p>

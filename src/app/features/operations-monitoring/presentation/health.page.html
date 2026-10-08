@@ -4,13 +4,13 @@
     <h1>{{ locale.text('Clinical history', 'Historial clínico') }}</h1>
     <p class="page-lead">{{ facade.workspace.herdName() }} · {{ locale.text('Field observations and veterinary records, in capture order', 'Observaciones de campo y registros veterinarios, por hora de captura') }}</p>
   </div>
-  <span class="badge neutral">{{ locale.text('Demo records · local only', 'Registros de demo · solo locales') }}</span>
+  <span class="badge neutral">{{ locale.text('Care records', 'Registros de atención') }}</span>
 </header>
 
 <section class="stats-grid" [attr.aria-label]="locale.text('Health record overview', 'Resumen del historial clínico')">
-  <div class="stat featured"><span class="stat-label">{{ locale.text('Health records', 'Registros de salud') }}</span><strong class="stat-value">{{ locale.number(facade.healthRecords().length) }}</strong><span class="stat-note">{{ locale.text('In this herd demo', 'En esta demo del hato') }}</span></div>
-  <div class="stat"><span class="stat-label">{{ locale.text('Animals under withdrawal', 'Animales en periodo de retiro') }}</span><strong class="stat-value">{{ locale.number(activeWithdrawalAnimals()) }}</strong><span class="stat-note">{{ locale.text('Based on recorded sample dates', 'Según las fechas de muestra registradas') }}</span></div>
-  <div class="stat"><span class="stat-label">{{ locale.text('Role', 'Rol') }}</span><strong class="stat-value role-value">{{ facade.workspace.role() === 'veterinarian' ? locale.text('Veterinarian', 'Veterinario') : locale.text('Rancher', 'Ganadero') }}</strong><span class="stat-note">{{ locale.text('Available record types follow this demo role', 'Los tipos de registro disponibles dependen del rol de demo') }}</span></div>
+  <div class="stat featured"><span class="stat-label">{{ locale.text('Health records', 'Registros de salud') }}</span><strong class="stat-value">{{ locale.number(facade.healthRecords().length) }}</strong><span class="stat-note">{{ locale.text('In this herd', 'En este hato') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Animals under withdrawal', 'Animales en periodo de retiro') }}</span><strong class="stat-value">{{ locale.number(activeWithdrawalAnimals()) }}</strong><span class="stat-note">{{ locale.text('Based on recorded dates', 'Según las fechas registradas') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Role', 'Rol') }}</span><strong class="stat-value role-value">{{ facade.workspace.role() === 'veterinarian' ? locale.text('Veterinarian', 'Veterinario') : locale.text('Rancher', 'Ganadero') }}</strong><span class="stat-note">{{ locale.text('Available record types follow the selected role', 'Los tipos de registro disponibles dependen del rol seleccionado') }}</span></div>
 </section>
 
 @if (facade.feedback(); as feedback) {
@@ -19,11 +19,11 @@
 
 <div class="split-grid health-layout">
   <section class="panel" aria-labelledby="health-entry-title">
-    <div class="panel-head"><div><h2 id="health-entry-title">{{ locale.text('Record a care event', 'Registrar un evento de atención') }}</h2><p class="text-muted">{{ locale.text('This demo does not diagnose or prescribe treatment.', 'Esta demo no diagnostica ni prescribe tratamientos.') }}</p></div></div>
+    <div class="panel-head"><div><h2 id="health-entry-title">{{ locale.text('Record a care event', 'Registrar un evento de atención') }}</h2><p class="text-muted">{{ locale.text('Records do not replace veterinary diagnosis or treatment.', 'Los registros no sustituyen el diagnóstico ni el tratamiento veterinario.') }}</p></div></div>
     <div class="panel-body">
       <p class="notice role-guidance">
         @if (facade.workspace.role() === 'veterinarian') {
-          {{ locale.text('Veterinary entries are illustrative. Verify products, doses and withdrawal requirements through your clinical process.', 'Los registros veterinarios son ilustrativos. Verifica productos, dosis y periodos de retiro según tu proceso clínico.') }}
+          {{ locale.text('Verify products, doses and withdrawal requirements through your clinical process.', 'Verifica productos, dosis y periodos de retiro según tu proceso clínico.') }}
         } @else {
           {{ locale.text('Field notes document what was observed. They are not a diagnosis or a clinical intervention.', 'Las notas de campo documentan lo observado. No son un diagnóstico ni una intervención clínica.') }}
         }
@@ -51,7 +51,7 @@
             <label for="health-date">{{ locale.text('Date of event', 'Fecha del evento') }}</label>
             <input id="health-date" type="date" formControlName="occurredAt" [max]="maximumDay" required [attr.aria-invalid]="recordForm.controls.occurredAt.invalid && recordForm.controls.occurredAt.touched ? 'true' : null" />
             @if (recordForm.controls.occurredAt.hasError('calendarDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a real calendar date.', 'Escribe una fecha de calendario válida.') }}</span> }
-            @if (recordForm.controls.occurredAt.hasError('futureDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('The date cannot be after the demo date.', 'La fecha no puede ser posterior a la fecha de demo.') }}</span> }
+            @if (recordForm.controls.occurredAt.hasError('futureDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('The date cannot be after the workspace date.', 'La fecha no puede ser posterior a la fecha del espacio de trabajo.') }}</span> }
           </div>
 
           <div class="field field-wide">
@@ -64,7 +64,7 @@
           @if (requiresWithdrawal()) {
             <fieldset class="field-wide medication-fields">
               <legend>{{ locale.text('Product and withdrawal record', 'Registro del producto y retiro') }}</legend>
-              <p class="text-muted">{{ locale.text('Enter the recorded details. The demo does not calculate a veterinary dose.', 'Ingresa los datos registrados. La demo no calcula dosis veterinarias.') }}</p>
+              <p class="text-muted">{{ locale.text('Enter the recorded details. Doses must be provided by the veterinarian.', 'Ingresa los datos registrados. El veterinario debe indicar las dosis.') }}</p>
               <div class="form-grid">
                 <div class="field">
                   <label for="health-product">{{ locale.text('Product', 'Producto') }}</label>
@@ -79,7 +79,7 @@
                 <div class="field">
                   <label for="withdrawal-start">{{ locale.text('Withdrawal starts', 'Inicio del retiro') }}</label>
                   <input id="withdrawal-start" type="date" formControlName="withdrawalStart" [max]="maximumDay" required />
-                  @if (recordForm.controls.withdrawalStart.invalid && recordForm.controls.withdrawalStart.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a valid date no later than the demo date.', 'Ingresa una fecha válida hasta la fecha de demo.') }}</span> }
+                  @if (recordForm.controls.withdrawalStart.invalid && recordForm.controls.withdrawalStart.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a valid date no later than the workspace date.', 'Ingresa una fecha válida hasta la fecha del espacio de trabajo.') }}</span> }
                   @if (recordForm.hasError('withdrawalBeforeRecord')) { <span class="form-error" role="alert">{{ locale.text('Withdrawal must start on or after the event date.', 'El retiro debe iniciar el día del evento o después.') }}</span> }
                 </div>
                 <div class="field">
@@ -105,7 +105,7 @@
           }
         </div>
 
-        <button class="btn primary save-record" type="submit">{{ locale.text('Save demo record', 'Guardar registro de demo') }}</button>
+        <button class="btn primary save-record" type="submit">{{ locale.text('Save record', 'Guardar registro') }}</button>
       </form>
     </div>
   </section>

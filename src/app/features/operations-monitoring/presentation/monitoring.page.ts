@@ -36,7 +36,7 @@ export class MonitoringPage {
   }
 
   clearFilters(): void { this.filters.reset({ animal: '', freshness: '', lot: '' }); }
-  lotFreshness(lot: NutritionLot): string { return !lot.capturedAt ? this.locale.text('No data', 'Sin datos') : Date.parse(this.facade.workspace.now) - Date.parse(lot.capturedAt) > 30 * 60_000 ? this.locale.text('Stale sample', 'Muestra antigua') : this.locale.text('Recent sample', 'Muestra reciente'); }
+  lotFreshness(lot: NutritionLot): string { return !lot.capturedAt ? this.locale.text('No data', 'Sin datos') : Date.parse(this.facade.workspace.now) - Date.parse(lot.capturedAt) > 30 * 60_000 ? this.locale.text('Stale reading', 'Lectura antigua') : this.locale.text('Recent reading', 'Lectura reciente'); }
   heaterLabel(lot: NutritionLot): string { return lot.heater === 'unknown' ? this.locale.text('Unknown', 'Desconocido') : lot.heater === 'off' ? this.locale.text('Reported off', 'Reportado apagado') : this.locale.text('Reported on', 'Reportado encendido'); }
 }
 

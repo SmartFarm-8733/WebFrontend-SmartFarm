@@ -4,12 +4,12 @@
     <h1>{{ locale.text('Reproduction', 'Reproducción') }}</h1>
     <p class="page-lead">{{ facade.workspace.herdName() }} · {{ locale.text('Field observations and service records in one herd timeline', 'Observaciones de campo y servicios en una cronología del hato') }}</p>
   </div>
-  <span class="badge neutral">{{ locale.text('Demo records · no pregnancy status', 'Registros de demo · sin estado de gestación') }}</span>
+  <span class="badge neutral">{{ locale.text('Reproductive records', 'Registros reproductivos') }}</span>
 </header>
 
 <section class="stats-grid" [attr.aria-label]="locale.text('Reproductive record overview', 'Resumen de registros reproductivos')">
   <div class="stat featured"><span class="stat-label">{{ locale.text('Possible heat reports', 'Reportes de posible celo') }}</span><strong class="stat-value">{{ locale.number(heatCount()) }}</strong><span class="stat-note">{{ locale.text('Unconfirmed field observations', 'Observaciones de campo sin confirmar') }}</span></div>
-  <div class="stat"><span class="stat-label">{{ locale.text('Service records', 'Registros de servicio') }}</span><strong class="stat-value">{{ locale.number(serviceCount()) }}</strong><span class="stat-note">{{ locale.text('Recorded in this herd demo', 'Registrados en esta demo del hato') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Service records', 'Registros de servicio') }}</span><strong class="stat-value">{{ locale.number(serviceCount()) }}</strong><span class="stat-note">{{ locale.text('Recorded in this herd', 'Registrados en este hato') }}</span></div>
   <div class="stat"><span class="stat-label">{{ locale.text('Calving observations', 'Observaciones de parto') }}</span><strong class="stat-value">{{ locale.number(calvingCount()) }}</strong><span class="stat-note">{{ locale.text('No delivery prediction is modeled', 'No se modela una predicción de parto') }}</span></div>
 </section>
 
@@ -27,7 +27,7 @@
 
 <div class="split-grid reproduction-layout">
   <section class="panel" aria-labelledby="reproduction-entry-title">
-    <div class="panel-head"><div><h2 id="reproduction-entry-title">{{ locale.text('Record a reproductive event', 'Registrar un evento reproductivo') }}</h2><p class="text-muted">{{ locale.text('Available record types follow the selected demo role.', 'Los tipos disponibles dependen del rol de demo seleccionado.') }}</p></div></div>
+    <div class="panel-head"><div><h2 id="reproduction-entry-title">{{ locale.text('Record a reproductive event', 'Registrar un evento reproductivo') }}</h2><p class="text-muted">{{ locale.text('Available record types follow the selected role.', 'Los tipos disponibles dependen del rol seleccionado.') }}</p></div></div>
     <div class="panel-body">
       <form class="reproduction-form" [formGroup]="recordForm" (ngSubmit)="saveRecord()" novalidate>
         <div class="field">
@@ -50,7 +50,7 @@
           <label for="reproduction-date">{{ locale.text('Date of event', 'Fecha del evento') }}</label>
           <input id="reproduction-date" type="date" formControlName="occurredAt" [max]="maximumDay" required [attr.aria-invalid]="recordForm.controls.occurredAt.invalid && recordForm.controls.occurredAt.touched ? 'true' : null" />
           @if (recordForm.controls.occurredAt.hasError('calendarDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a real calendar date.', 'Escribe una fecha de calendario válida.') }}</span> }
-          @if (recordForm.controls.occurredAt.hasError('futureDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('The date cannot be after the demo date.', 'La fecha no puede ser posterior a la fecha de demo.') }}</span> }
+          @if (recordForm.controls.occurredAt.hasError('futureDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('The date cannot be after the workspace date.', 'La fecha no puede ser posterior a la fecha del espacio de trabajo.') }}</span> }
         </div>
 
         <div class="field">
@@ -60,7 +60,7 @@
           @if (recordForm.controls.note.invalid && recordForm.controls.note.touched) { <span id="reproduction-note-error" class="form-error" role="alert">{{ locale.text('Enter a note between 5 and 500 characters.', 'Escribe una nota de 5 a 500 caracteres.') }}</span> }
         </div>
 
-        <button class="btn primary save-record" type="submit">{{ locale.text('Save demo record', 'Guardar registro de demo') }}</button>
+        <button class="btn primary save-record" type="submit">{{ locale.text('Save record', 'Guardar registro') }}</button>
       </form>
     </div>
   </section>

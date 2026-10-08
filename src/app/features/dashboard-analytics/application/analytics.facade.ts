@@ -18,7 +18,7 @@ export class AnalyticsFacade {
   });
 
   csv(): string {
-    const rows: (string | number)[][] = [['ICHU TB1 sample report', this.workspace.herdName(), this.period()], ['Campaign', 'Date', 'Progress (%)', 'Status']];
+    const rows: (string | number)[][] = [['ICHU herd report', this.workspace.herdName(), this.period()], ['Campaign', 'Date', 'Progress (%)', 'Status']];
     for (const campaign of this.selectedCampaigns()) rows.push([campaign.name.en, campaign.date, campaign.progress, campaign.status]);
     rows.push([], ['Current inventory (not historical)'], ['Active animals', this.metrics().activeAnimals], ['Open alerts', this.metrics().openAlerts], ['Connected collars', this.metrics().connectedCollars]);
     return '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n');

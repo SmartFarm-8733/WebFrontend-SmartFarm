@@ -13,7 +13,7 @@
     }
   </header>
 
-  <p class="demo-note">{{ locale.text('TB1 demo · Sample animals. Changes last until this page is reloaded.', 'Demo TB1 · Animales de ejemplo. Los cambios duran hasta recargar la página.') }}</p>
+  <p class="demo-note">{{ locale.text('Review the herd inventory and each animal’s history.', 'Consulta el inventario del hato y el historial de cada animal.') }}</p>
   @if (!facade.writable()) {
     <p class="notice" role="status">{{ locale.text('Veterinary view · Read only. The rancher manages registrations, stages and exits.', 'Vista veterinaria · Solo lectura. El ganadero gestiona registros, etapas y bajas.') }}</p>
   }
@@ -85,7 +85,7 @@
 
   <div class="stats-grid" [attr.aria-label]="locale.text('Herd summary', 'Resumen del hato')">
     <div class="stat featured"><span class="stat-label">{{ locale.text('Active animals', 'Animales activos') }}</span><strong class="stat-value">{{ locale.number(facade.stats().active) }}</strong><span class="stat-note">{{ locale.text('In the selected herd', 'En el hato seleccionado') }}</span></div>
-    <div class="stat"><span class="stat-label">{{ locale.text('Connected collars', 'Collares conectados') }}</span><strong class="stat-value">{{ locale.number(facade.stats().connected) }}</strong><span class="stat-note">{{ locale.text('Sample connection state', 'Estado de conexión de ejemplo') }}</span></div>
+    <div class="stat"><span class="stat-label">{{ locale.text('Connected collars', 'Collares conectados') }}</span><strong class="stat-value">{{ locale.number(facade.stats().connected) }}</strong><span class="stat-note">{{ locale.text('Last recorded connection state', 'Último estado de conexión registrado') }}</span></div>
     <div class="stat"><span class="stat-label">{{ locale.text('Under observation', 'En observación') }}</span><strong class="stat-value">{{ locale.number(facade.stats().observation) }}</strong><span class="stat-note">{{ locale.text('Review in health records', 'Revisar en historial sanitario') }}</span></div>
     <div class="stat"><span class="stat-label">{{ locale.text('Recorded exits', 'Bajas registradas') }}</span><strong class="stat-value">{{ locale.number(facade.stats().inactive) }}</strong><span class="stat-note">{{ locale.text('History preserved', 'Historial conservado') }}</span></div>
   </div>
