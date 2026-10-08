@@ -2,7 +2,7 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { LocaleService } from '../../../core/config/locale.service';
 import { WorkspaceService } from '../../../core/config/workspace.service';
 import { CattleRepository } from '../domain/cattle.repository';
-import { EXIT_REASONS, LIFE_STAGES, LOTS, validStageForSex } from '../domain/cattle';
+import { EXIT_REASONS, LIFE_STAGES, LOTS, normalizeTag, validStageForSex } from '../domain/cattle';
 import type { Cattle, CattleError, ExitReason, LifeStage, Lot, Registration, Result, Sex } from '../domain/cattle';
 
 export interface CattleFilters {
@@ -46,6 +46,11 @@ export class CattleFacade {
   }
 
   find(id: string): Cattle | undefined { return this.animals().find(animal => animal.id === id); }
+
+  findByTag(tag: string): Cattle | undefined {
+    const normalizedTag = normalizeTag(tag);
+    return this.animals().find(animal => normalizeTag(animal.tag) === normalizedTag);
+  }
 
   select(filters: CattleFilters): readonly Cattle[] {
     const query = filters.search.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -109,7 +114,7 @@ export class CattleFacade {
   }
 
   private authorized(): boolean {
-    return ['esperanza', 'pucara'].includes(this.workspace.herdId());
+    return this.workspace.availableHerds().some(herd => herd.id === this.workspace.herdId());
   }
 
   private finish(result: Result<Cattle>): boolean { this.result.set(result); return result.ok; }
