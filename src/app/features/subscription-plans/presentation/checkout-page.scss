@@ -1,0 +1,25 @@
+:host { display: block; min-width: 0; }
+.checkout-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 20px; align-items: start; }
+.checkout-form-panel, .checkout-summary { min-width: 0; }
+.payment-notice { margin-bottom: 4px; }
+.capacity-notice { display: grid; gap: 6px; }
+.terms-field { gap: 4px; }
+.terms-label { display: flex; gap: 12px; align-items: flex-start; min-height: 44px; cursor: pointer; }
+.terms-label input { flex: 0 0 20px; margin: 3px 0 0; width: 20px; height: 20px; }
+.terms-label span { line-height: 1.5; }
+.activation-result { margin-top: 20px; }
+.summary-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); font-size: .8125rem; }
+.summary-row > span { color: var(--muted); }
+.summary-row > strong { text-align: right; overflow-wrap: anywhere; }
+.summary-device-limit { display: grid; }
+.summary-device-limit strong { text-align: left; font-weight: 500; }
+.summary-total { display: grid; gap: 4px; padding-top: 4px; }
+.summary-total span { color: var(--muted); font-size: .75rem; }
+.summary-total strong { color: var(--forest); font: 600 1.8rem/1.25 var(--font-heading); }
+.summary-note { font-size: .75rem; line-height: 1.6; }
+.checkout-summary { position: sticky; top: 20px; }
+
+@media (max-width: 850px) {
+  .checkout-layout { grid-template-columns: minmax(0, 1fr); }
+  .checkout-summary { position: static; }
+}

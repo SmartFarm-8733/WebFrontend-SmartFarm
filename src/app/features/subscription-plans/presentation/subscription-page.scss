@@ -1,0 +1,34 @@
+:host { display: block; min-width: 0; }
+.plan-disclaimer, .role-note, .previous-activation { margin-bottom: 20px; }
+.role-note { border-left-color: var(--forest); }
+.estimate-panel { margin-bottom: 24px; }
+.head-count-field { max-width: 360px; }
+.head-count-field input { min-height: 48px; }
+.head-count-field .text-muted { font-size: .75rem; }
+.form-error:empty { display: none; }
+.plan-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.plan-card { display: flex; flex-direction: column; gap: 18px; padding: 20px; }
+.plan-card.plan-featured { border-color: var(--forest); border-top: 4px solid var(--forest); }
+.plan-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.plan-card-heading .eyebrow { margin: 0 0 6px; }
+.plan-card-heading h2 { font-size: 1.25rem; }
+.plan-rate { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+.plan-rate strong { color: var(--forest); font: 600 1.9rem/1.2 var(--font-heading); }
+.plan-rate span { color: var(--muted); font-size: .8rem; }
+.plan-head-limit { font-weight: 600; }
+.plan-coverage { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.plan-coverage li { position: relative; padding-left: 18px; font-size: .8125rem; }
+.plan-coverage li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); font-weight: 700; }
+.plan-limits { border-top: 1px solid var(--border); margin: auto 0 0; padding-top: 12px; }
+.plan-limits > div { display: grid; gap: 5px; }
+.plan-limits dt { color: var(--muted); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.plan-limits dd { margin: 0; font-size: .75rem; line-height: 1.5; }
+.plan-estimate { display: grid; gap: 3px; padding-top: 10px; border-top: 1px solid var(--border); }
+.plan-estimate span { color: var(--muted); font-size: .75rem; }
+.plan-estimate strong { font-family: var(--font-heading); font-size: 1.2rem; }
+.capacity-message { line-height: 1.5; }
+.plan-card > .btn { width: 100%; }
+.previous-activation { margin-top: 24px; }
+
+@media (max-width: 980px) { .plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .plan-grid { grid-template-columns: minmax(0, 1fr); } .plan-card { padding: 18px; } }
