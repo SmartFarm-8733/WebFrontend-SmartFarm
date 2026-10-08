@@ -55,4 +55,3 @@ export abstract class IdentityRepository {
     herdId: string, id: string, action: AdvisoryAction, role: DemoRole, now: string,
   ): AdvisoryResult;
 }
-
