@@ -1,0 +1,368 @@
+:host {
+  display: block;
+}
+
+.devices-page {
+  display: grid;
+  gap: 1.5rem;
+  width: min(calc(100% - 2rem), 1440px);
+  margin-inline: auto;
+  padding-block: 2rem 3rem;
+  color: var(--ink, #27271f);
+}
+
+.devices-heading {
+  align-items: end;
+  margin-bottom: 0;
+}
+
+.herd-context {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 12rem;
+  padding: 0.65rem 0 0.65rem 1rem;
+  border-left: 2px solid var(--gold, #e4b842);
+}
+
+.herd-context strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.stat-total {
+  color: inherit;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.notice-success,
+.notice-warning,
+.notice-danger,
+.notice-info {
+  border-left-color: var(--forest, #33513e);
+}
+
+.notice-success {
+  background: #f1f6f1;
+  color: #315f3d;
+}
+
+.notice-warning {
+  border-left-color: #96742c;
+  background: #fbf7eb;
+  color: #72551d;
+}
+
+.notice-danger {
+  border-left-color: #a4463c;
+  background: #fbf2f0;
+  color: #8b342b;
+}
+
+.notice-info {
+  background: #f2f5f1;
+}
+
+.devices-layout {
+  grid-template-columns: minmax(0, 1.55fr) minmax(20rem, 0.85fr);
+  align-items: start;
+  gap: 1rem;
+}
+
+.inventory-head p {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+}
+
+.inventory-count {
+  display: grid;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid var(--border, #e1ded4);
+  color: var(--forest, #33513e);
+  font-size: 0.8rem;
+}
+
+.inventory-filters {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1.4fr) repeat(2, minmax(8.5rem, 0.9fr)) auto;
+  align-items: end;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.inventory-filters .field input,
+.inventory-filters .field select {
+  width: 100%;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.btn:focus-visible,
+.device-select:focus-visible,
+.table-scroll:focus-visible {
+  outline: 3px solid #9e8435;
+  outline-offset: 2px;
+}
+
+.field input[aria-invalid='true'],
+.field select[aria-invalid='true'] {
+  border-color: #a4463c;
+}
+
+.field input:disabled,
+.field select:disabled {
+  cursor: not-allowed;
+}
+
+.btn:disabled {
+  border-color: var(--border, #e1ded4);
+  background: #ecebe5;
+  color: #55564d;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.clear-filters {
+  white-space: nowrap;
+}
+
+.table-scroll {
+  overscroll-behavior-inline: contain;
+}
+
+.device-table {
+  min-width: 790px;
+}
+
+.device-table td:nth-child(2) {
+  max-width: 14rem;
+  white-space: normal;
+}
+
+.device-table tbody tr.is-selected {
+  background: #f4f6f2;
+}
+
+.device-table tbody tr.is-selected td:first-child {
+  box-shadow: inset 3px 0 var(--forest, #33513e);
+}
+
+.device-select {
+  display: grid;
+  min-width: 6.25rem;
+  min-height: 44px;
+  align-content: center;
+  justify-items: start;
+  gap: 0.15rem;
+  padding: 0.2rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--forest, #33513e);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.device-select:hover .mono,
+.device-select[aria-pressed='true'] .mono {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.device-type,
+.sub-label {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--muted, #68695e);
+  font-size: 0.69rem;
+  line-height: 1.35;
+}
+
+.stale-label,
+.low-battery {
+  color: #72551d;
+  font-weight: 600;
+}
+
+.detail-head {
+  align-items: start;
+}
+
+.detail-head h2 {
+  overflow-wrap: anywhere;
+}
+
+.device-kind {
+  max-width: 9rem;
+  text-align: center;
+}
+
+.detail-content {
+  gap: 1.1rem;
+}
+
+.device-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+}
+
+.device-facts > div {
+  min-width: 0;
+  padding: 0.65rem 0.45rem 0.65rem 0;
+  border-bottom: 1px solid var(--border, #e1ded4);
+}
+
+.device-facts dt {
+  margin-bottom: 0.25rem;
+  color: var(--muted, #68695e);
+  font-size: 0.7rem;
+}
+
+.device-facts dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.79rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.assignment-section,
+.history-section {
+  display: grid;
+  gap: 0.7rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border, #e1ded4);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.section-heading h3,
+.history-section h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.assignment-target,
+.assignment-section > .text-muted,
+.assignment-form > p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.assignment-target strong {
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.assignment-note {
+  font-size: 0.78rem;
+}
+
+.assignment-form {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 0.2rem;
+}
+
+.assignment-form > .btn,
+.unassign-button {
+  justify-self: start;
+}
+
+.field-help {
+  color: var(--muted, #68695e);
+  font-size: 0.73rem;
+  line-height: 1.45;
+}
+
+.assignment-history {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  font-size: 0.77rem;
+}
+
+.assignment-history li {
+  display: grid;
+  gap: 0.18rem;
+  padding-left: 0.1rem;
+  line-height: 1.45;
+}
+
+.detail-empty {
+  min-height: 15rem;
+  align-content: center;
+}
+
+@media (max-width: 1120px) {
+  .devices-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inventory-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search-field {
+    grid-column: 1 / -1;
+  }
+
+  .clear-filters {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .devices-page {
+    width: min(calc(100% - 1.25rem), 1440px);
+    gap: 1.1rem;
+    padding-block: 1.25rem 2rem;
+  }
+
+  .devices-heading {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .herd-context {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .devices-page {
+    width: calc(100% - 1rem);
+  }
+
+  .inventory-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .search-field {
+    grid-column: auto;
+  }
+
+  .clear-filters,
+  .assignment-form > .btn,
+  .unassign-button {
+    width: 100%;
+  }
+
+  .device-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
