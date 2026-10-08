@@ -34,6 +34,19 @@ p { margin: 0; }
 .btn.gold { background: var(--gold); border-color: var(--gold); color: var(--forest-deep); }
 .btn.secondary { background: white; }
 .btn.danger { color: var(--danger); border-color: #d6aaa4; }
+.btn {
+  --mat-button-filled-container-shape: 8px;
+  --mat-button-text-container-shape: 8px;
+  --mat-button-filled-container-height: 44px;
+  --mat-button-text-container-height: 44px;
+  --mat-button-filled-label-text-font: var(--font-body);
+  --mat-button-filled-label-text-size: .8125rem;
+  --mat-button-filled-container-color: white;
+  --mat-button-filled-label-text-color: var(--forest);
+  --mat-button-text-label-text-color: var(--forest);
+}
+.btn.primary { --mat-button-filled-container-color: var(--forest); --mat-button-filled-label-text-color: white; }
+.btn.gold { --mat-button-filled-container-color: var(--gold); --mat-button-filled-label-text-color: var(--forest-deep); }
 .btn:hover { filter: brightness(.97); }
 .btn.primary:hover { background: var(--forest-deep); }
 .panel { min-width: 0; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); overflow: hidden; }
