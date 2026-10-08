@@ -34,6 +34,19 @@ p { margin: 0; }
 .btn.gold { background: var(--gold); border-color: var(--gold); color: var(--forest-deep); }
 .btn.secondary { background: white; }
 .btn.danger { color: var(--danger); border-color: #d6aaa4; }
+.btn {
+  --mat-button-filled-container-shape: 8px;
+  --mat-button-text-container-shape: 8px;
+  --mat-button-filled-container-height: 44px;
+  --mat-button-text-container-height: 44px;
+  --mat-button-filled-label-text-font: var(--font-body);
+  --mat-button-filled-label-text-size: .8125rem;
+  --mat-button-filled-container-color: white;
+  --mat-button-filled-label-text-color: var(--forest);
+  --mat-button-text-label-text-color: var(--forest);
+}
+.btn.primary { --mat-button-filled-container-color: var(--forest); --mat-button-filled-label-text-color: white; }
+.btn.gold { --mat-button-filled-container-color: var(--gold); --mat-button-filled-label-text-color: var(--forest-deep); }
 .btn:hover { filter: brightness(.97); }
 .btn.primary:hover { background: var(--forest-deep); }
 .panel { min-width: 0; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); overflow: hidden; }
@@ -77,3 +90,16 @@ input[type=checkbox], input[type=radio] { width: 18px; height: 18px; accent-colo
 @media (max-width: 1080px) { .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .split-grid { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .page-heading { gap: 16px; } .form-grid { grid-template-columns: 1fr; } .stat { padding: 16px; } .stat-value { font-size: 1.7rem; } .panel-body { padding: 16px; } .toolbar { width: 100%; } .toolbar input { flex: 1; min-width: 0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+@media print {
+  @page { size: A4; margin: 16mm; }
+  body { background: white; color: #111; font-size: 10pt; }
+  .sidebar, .workspace-header, .demo-strip, .workspace-footer, .skip-link, .scrim { display: none !important; }
+  .workspace, .workspace-main { display: block !important; margin: 0 !important; }
+  .workspace-content { padding: 0 !important; max-width: none !important; }
+  .panel, .stat { break-inside: avoid; box-shadow: none; }
+  .table-scroll { overflow: visible; }
+  .data-table th, .data-table td { white-space: normal; padding: 8px; }
+  .stat.featured { background: white; color: #111; }
+  .stat.featured .stat-label, .stat.featured .stat-note { color: #444; }
+  .btn, button { display: none !important; }
+}
