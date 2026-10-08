@@ -1,0 +1,9 @@
+:host { display: grid; gap: 24px; }
+.page-heading, .stats-grid { margin-bottom: 0; }
+.period-filter { padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: .8125rem; }
+.report-row { display: flex; align-items: center; gap: 24px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+.report-row:last-child { border-bottom: 0; } .report-row > div { flex: 1; }
+.report-row strong { font-size: .875rem; } .report-row p { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+progress { width: 30%; height: 10px; accent-color: var(--forest); } .provenance { display: grid; gap: 16px; font-size: .8125rem; color: var(--muted); line-height: 1.8; }
+@media print { .toolbar, .page-heading .toolbar { display: none; } .stat, .panel { break-inside: avoid; } :host { color: #000; } }
+@media (max-width: 560px) { .report-row { gap: 12px; flex-wrap: wrap; } .report-row > div { flex-basis: 100%; } progress { flex: 1; } }
