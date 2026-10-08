@@ -143,6 +143,16 @@
           </div>
         </section>
 
+        <section class="panel monitoring-panel" aria-labelledby="monitoring-title">
+          <div class="panel-head"><h2 id="monitoring-title">{{ locale.text('Monitoring', 'Monitoreo') }}</h2></div>
+          <div class="panel-body">
+            <p class="text-muted">{{ locale.text('Open this animal’s monitoring view.', 'Abre el monitoreo de este animal.') }}</p>
+            <a class="btn secondary monitoring-link" [routerLink]="['/monitoring']" [queryParams]="{ animal: animal.tag }">
+              {{ locale.text('View monitoring', 'Ver monitoreo') }}
+            </a>
+          </div>
+        </section>
+
         @if (animal.status === 'active' && facade.writable()) {
           <section class="panel action-panel" aria-labelledby="actions-title">
             <div class="panel-head"><h2 id="actions-title">{{ locale.text('Life cycle actions', 'Acciones del ciclo de vida') }}</h2></div>
