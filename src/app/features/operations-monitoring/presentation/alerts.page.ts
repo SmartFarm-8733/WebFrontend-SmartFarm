@@ -53,6 +53,10 @@ export class AlertsPage {
     );
   }
 
+  animalName(animalId: string): string {
+    return this.facade.animals().find((animal) => animal.id === animalId)?.name ?? this.locale.text('Animal unavailable', 'Animal no disponible');
+  }
+
   beginResponse(alert: MonitoringAlert): void {
     this.responseAlertId.set(alert.id);
     this.responseAction.set(alert.status === 'open' ? 'acknowledged' : 'resolved');
