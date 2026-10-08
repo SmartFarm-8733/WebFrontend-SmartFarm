@@ -1,0 +1,246 @@
+<div class="stack cattle-detail">
+  <nav class="breadcrumb" [attr.aria-label]="locale.text('Breadcrumb', 'Ruta de navegación')">
+    <a routerLink="/cattle">{{ locale.text('Animals', 'Animales') }}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ animal()?.tag ?? locale.text('Animal record', 'Ficha del animal') }}</span>
+  </nav>
+
+  @if (animal(); as animal) {
+    <header class="page-heading detail-heading">
+      <div>
+        <p class="eyebrow">{{ workspace.herdName() }} · <span class="mono">{{ animal.tag }}</span></p>
+        <h1>{{ animal.name }}</h1>
+        <p class="page-lead">{{ animal.breed }} · {{ facade.lotLabel(animal.lot) }}</p>
+      </div>
+      <span class="badge record-badge" [class.success]="animal.status === 'active' && animal.health === 'healthy'"
+        [class.warning]="animal.status === 'active' && animal.health === 'observation'"
+        [class.neutral]="animal.status === 'inactive'">{{ facade.statusLabel(animal) }}</span>
+    </header>
+
+    <p class="demo-note">{{ locale.text('Sample record · Changes in this demo reset when the page is reloaded.', 'Ficha de ejemplo · Los cambios de esta demo se restablecen al recargar la página.') }}</p>
+
+    @if (saved(); as savedAction) {
+      <p class="notice" role="status" aria-live="polite">
+        @if (savedAction === 'stage') {
+          {{ locale.text('Life stage updated. The previous stage remains in the history.', 'Etapa actualizada. La etapa anterior permanece en el historial.') }}
+        } @else {
+          {{ locale.text('Exit recorded. The animal history is preserved.', 'Baja registrada. El historial del animal se conserva.') }}
+        }
+      </p>
+    }
+
+    @if (animal.status === 'inactive') {
+      <p class="notice" role="status">{{ locale.text('This animal is inactive. Its record remains available for reference.', 'Este animal está inactivo. Su ficha permanece disponible para consulta.') }}</p>
+    } @else if (!facade.writable()) {
+      <p class="notice" role="status">{{ locale.text('Veterinary view · Read only for animal registration, stage changes and exits.', 'Vista veterinaria · Solo lectura para registros, cambios de etapa y bajas.') }}</p>
+    }
+
+    <div class="split-grid detail-layout">
+      <div class="stack detail-primary">
+        <section class="panel" aria-labelledby="profile-title">
+          <div class="panel-head">
+            <h2 id="profile-title">{{ locale.text('Animal profile', 'Ficha del animal') }}</h2>
+            <span class="text-muted">{{ locale.text('Identity and production details', 'Identidad y datos productivos') }}</span>
+          </div>
+          <div class="panel-body">
+            <dl class="identity-grid">
+              <div class="record-field">
+                <dt>{{ locale.text('Ear tag', 'Arete') }}</dt>
+                <dd class="mono">{{ animal.tag }}</dd>
+              </div>
+              <div class="record-field">
+                <dt>{{ locale.text('Name', 'Nombre') }}</dt>
+                <dd>{{ animal.name }}</dd>
+              </div>
+              <div class="record-field">
+                <dt>{{ locale.text('Breed', 'Raza') }}</dt>
+                <dd>{{ animal.breed }}</dd>
+              </div>
+              <div class="record-field">
+                <dt>{{ locale.text('Sex', 'Sexo') }}</dt>
+                <dd>{{ animal.sex === 'female' ? locale.text('Female', 'Hembra') : locale.text('Male', 'Macho') }}</dd>
+              </div>
+              <div class="record-field">
+                <dt>{{ locale.text('Date of birth', 'Fecha de nacimiento') }}</dt>
+                <dd><time [attr.datetime]="animal.birthDate">{{ facade.date(animal.birthDate) }}</time></dd>
+              </div>
+              <div class="record-field">
+                <dt>{{ locale.text('Registered', 'Fecha de registro') }}</dt>
+                <dd><time [attr.datetime]="animal.registeredAt">{{ facade.date(animal.registeredAt) }}</time></dd>
+              </div>
+              <div class="record-field">
+                <dt>{{ locale.text('Current life stage', 'Etapa productiva actual') }}</dt>
+                <dd>{{ facade.stageLabel(animal.stage) }}</dd>
+              </div>
+              <div class="record-field">
+                <dt>{{ locale.text('Lot', 'Lote') }}</dt>
+                <dd>{{ facade.lotLabel(animal.lot) }}</dd>
+              </div>
+            </dl>
+
+            @if (animal.exit; as exit) {
+              <div class="exit-record">
+                <h3>{{ locale.text('Exit record', 'Registro de baja') }}</h3>
+                <p>{{ facade.reasonLabel(exit.reason) }} · <time [attr.datetime]="exit.at">{{ facade.date(exit.at) }}</time></p>
+                @if (exit.releasedCollarId) {
+                  <p>{{ locale.text('Released collar', 'Collar liberado') }} · <span class="mono">{{ exit.releasedCollarId }}</span></p>
+                }
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="history-title">
+          <div class="panel-head">
+            <h2 id="history-title">{{ locale.text('Life stage history', 'Historial de etapas') }}</h2>
+            <span class="text-muted">{{ locale.text('Most recent first', 'Más reciente primero') }}</span>
+          </div>
+          <div class="panel-body">
+            <ol class="stage-history">
+              @for (period of history(); track $index) {
+                <li>
+                  <span class="history-marker" aria-hidden="true"></span>
+                  <div class="history-entry">
+                    <h3>{{ facade.stageLabel(period.stage) }}</h3>
+                    <p>
+                      {{ locale.text('From', 'Desde') }} <time [attr.datetime]="period.from">{{ facade.date(period.from) }}</time>
+                      @if (period.to) {
+                        <span> · {{ locale.text('through', 'hasta') }} <time [attr.datetime]="period.to">{{ facade.date(period.to) }}</time></span>
+                      } @else {
+                        <span class="badge success">{{ locale.text('Current', 'Actual') }}</span>
+                      }
+                    </p>
+                  </div>
+                </li>
+              } @empty {
+                <li class="text-muted">{{ locale.text('No stage history is available.', 'No hay historial de etapas disponible.') }}</li>
+              }
+            </ol>
+          </div>
+        </section>
+      </div>
+
+      <aside class="stack detail-aside" [attr.aria-label]="locale.text('Animal status and actions', 'Estado y acciones del animal')">
+        <section class="panel collar-panel" aria-labelledby="collar-title">
+          <div class="panel-head"><h2 id="collar-title">{{ locale.text('Collar', 'Collar') }}</h2></div>
+          <div class="panel-body">
+            @if (animal.collar; as collar) {
+              <p class="collar-state">
+                <span class="badge" [class.success]="collar.connection === 'connected'" [class.warning]="collar.connection === 'disconnected'">{{ facade.collarLabel(animal) }}</span>
+                <span class="mono">{{ collar.id }}</span>
+              </p>
+              <dl class="compact-record">
+                <div>
+                  <dt>{{ locale.text('Last communication', 'Última comunicación') }}</dt>
+                  <dd><time [attr.datetime]="collar.lastSeen">{{ facade.date(collar.lastSeen) }}</time></dd>
+                </div>
+              </dl>
+              <p class="text-muted collar-note">{{ locale.text('Connection status only. No live readings are included in this demo record.', 'Solo se muestra el estado de conexión. Esta ficha de demostración no incluye lecturas en vivo.') }}</p>
+            } @else {
+              <p><span class="badge neutral">{{ locale.text('No collar assigned', 'Sin collar asignado') }}</span></p>
+              <p class="text-muted collar-note">{{ locale.text('Device assignment is managed separately from the animal record.', 'La asignación del dispositivo se gestiona por separado de la ficha del animal.') }}</p>
+            }
+          </div>
+        </section>
+
+        <section class="panel monitoring-panel" aria-labelledby="monitoring-title">
+          <div class="panel-head"><h2 id="monitoring-title">{{ locale.text('Monitoring', 'Monitoreo') }}</h2></div>
+          <div class="panel-body">
+            <p class="text-muted">{{ locale.text('Open this animal’s monitoring view.', 'Abre el monitoreo de este animal.') }}</p>
+            <a class="btn secondary monitoring-link" [routerLink]="['/monitoring']" [queryParams]="{ animal: animal.tag }">
+              {{ locale.text('View monitoring', 'Ver monitoreo') }}
+            </a>
+          </div>
+        </section>
+
+        @if (animal.status === 'active' && facade.writable()) {
+          <section class="panel action-panel" aria-labelledby="actions-title">
+            <div class="panel-head"><h2 id="actions-title">{{ locale.text('Life cycle actions', 'Acciones del ciclo de vida') }}</h2></div>
+            <div class="panel-body">
+              @if (pending(); as change) {
+                <section class="confirmation" aria-labelledby="confirmation-title">
+                  <h3 id="confirmation-title">{{ change.type === 'stage' ? locale.text('Review stage change', 'Revisar cambio de etapa') : locale.text('Review animal exit', 'Revisar baja del animal') }}</h3>
+                  @if (change.type === 'stage') {
+                    <p>{{ facade.stageLabel(animal.stage) }} → <strong>{{ facade.stageLabel(change.stage) }}</strong></p>
+                    <p>{{ locale.text('Effective date', 'Fecha efectiva') }} · <time [attr.datetime]="change.at">{{ facade.date(change.at) }}</time></p>
+                  } @else {
+                    <p>{{ facade.reasonLabel(change.reason) }}</p>
+                    <p>{{ locale.text('Exit date', 'Fecha de baja') }} · <time [attr.datetime]="change.at">{{ facade.date(change.at) }}</time></p>
+                    <p class="text-muted">{{ locale.text('The animal will become inactive and its collar will be released.', 'El animal quedará inactivo y su collar será liberado.') }}</p>
+                  }
+                  <div class="form-actions">
+                    <button mat-flat-button class="btn primary" type="button" (click)="confirm()">{{ locale.text('Confirm', 'Confirmar') }}</button>
+                    <button mat-button class="btn secondary" type="button" (click)="edit()">{{ locale.text('Edit details', 'Editar datos') }}</button>
+                    <button mat-button class="btn secondary" type="button" (click)="cancel()">{{ locale.text('Cancel', 'Cancelar') }}</button>
+                  </div>
+                </section>
+              } @else if (operation() === 'stage') {
+                <form [formGroup]="stageForm" (ngSubmit)="review()" novalidate>
+                  <div class="field">
+                    <label for="stage-value">{{ locale.text('New life stage', 'Nueva etapa productiva') }}</label>
+                    <select id="stage-value" formControlName="stage" required>
+                      @for (stage of availableStages(); track stage) {
+                        <option [value]="stage">{{ facade.stageLabel(stage) }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="stage-date">{{ locale.text('Effective date', 'Fecha efectiva') }}</label>
+                    <input id="stage-date" type="date" formControlName="at" required [min]="currentSince()" [max]="today"
+                      [attr.aria-invalid]="stageForm.controls.at.touched && stageForm.controls.at.invalid ? 'true' : null"
+                      aria-describedby="stage-date-help">
+                    <span id="stage-date-help" [class.form-error]="stageForm.controls.at.touched && stageForm.controls.at.invalid">
+                      {{ locale.text('Choose a valid date from the start of the current stage through today.', 'Elige una fecha válida desde el inicio de la etapa actual hasta hoy.') }}
+                    </span>
+                  </div>
+                  @if (facade.error()) { <p class="form-error" role="alert">{{ facade.error() }}</p> }
+                  <div class="form-actions">
+                    <button mat-flat-button class="btn primary" type="submit">{{ locale.text('Review change', 'Revisar cambio') }}</button>
+                    <button mat-button class="btn secondary" type="button" (click)="cancel()">{{ locale.text('Cancel', 'Cancelar') }}</button>
+                  </div>
+                </form>
+              } @else if (operation() === 'exit') {
+                <form [formGroup]="exitForm" (ngSubmit)="review()" novalidate>
+                  <div class="field">
+                    <label for="exit-reason">{{ locale.text('Reason', 'Motivo') }}</label>
+                    <select id="exit-reason" formControlName="reason" required>
+                      @for (reason of facade.exitReasons; track reason) {
+                        <option [value]="reason">{{ facade.reasonLabel(reason) }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="exit-date">{{ locale.text('Exit date', 'Fecha de baja') }}</label>
+                    <input id="exit-date" type="date" formControlName="at" required [min]="currentSince()" [max]="today"
+                      [attr.aria-invalid]="exitForm.controls.at.touched && exitForm.controls.at.invalid ? 'true' : null"
+                      aria-describedby="exit-date-help">
+                    <span id="exit-date-help" [class.form-error]="exitForm.controls.at.touched && exitForm.controls.at.invalid">
+                      {{ locale.text('Choose a valid date from the start of the current stage through today.', 'Elige una fecha válida desde el inicio de la etapa actual hasta hoy.') }}
+                    </span>
+                  </div>
+                  @if (facade.error()) { <p class="form-error" role="alert">{{ facade.error() }}</p> }
+                  <div class="form-actions">
+                    <button mat-flat-button class="btn danger" type="submit">{{ locale.text('Review exit', 'Revisar baja') }}</button>
+                    <button mat-button class="btn secondary" type="button" (click)="cancel()">{{ locale.text('Cancel', 'Cancelar') }}</button>
+                  </div>
+                </form>
+              } @else {
+                <p class="text-muted action-intro">{{ locale.text('Changes are reviewed before they are recorded.', 'Los cambios se revisan antes de registrarse.') }}</p>
+                <div class="action-list">
+                  <button mat-stroked-button class="btn secondary" type="button" (click)="open('stage')">{{ locale.text('Change life stage', 'Cambiar etapa productiva') }}</button>
+                  <button mat-button class="btn danger" type="button" (click)="open('exit')">{{ locale.text('Record animal exit', 'Registrar baja del animal') }}</button>
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </aside>
+    </div>
+  } @else {
+    <section class="empty-state" role="status" aria-labelledby="missing-animal-title">
+      <h1 id="missing-animal-title">{{ locale.text('Animal unavailable', 'Animal no disponible') }}</h1>
+      <p>{{ locale.text('This record is not available in the currently selected herd.', 'Esta ficha no está disponible en el hato seleccionado.') }}</p>
+      <a class="btn secondary back-action" routerLink="/cattle">{{ locale.text('Return to animals', 'Volver a animales') }}</a>
+    </section>
+  }
+</div>
