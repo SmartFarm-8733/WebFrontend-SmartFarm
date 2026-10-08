@@ -11,6 +11,8 @@ npm start
 
 Default Angular development URL: http://localhost:4200.
 
+Open **Explore demo** and choose a rancher or veterinarian role. Use the header to select a herd, switch roles or change between English and Spanish. No credentials are required.
+
 On Windows machines where Application Control blocks the native build parser, use the optional Angular Webpack compatibility target:
 
 ```sh
@@ -74,8 +76,26 @@ The frontend uses fictional, in-memory demonstration records. Reloading resets t
 
 The demo starts in English (`en_US`) and supports Spanish (`es_419`). The mobile application, public landing page, edge software and .NET API are separate containers.
 
+## Demonstration screens
+
+| Area | Available journeys |
+|---|---|
+| Account | Demo entry, profile registration, recovery guidance, profile edits and advisory access. |
+| Herd | Search and filter animals, open records, register an animal, change stages and preserve exit history. |
+| Field and care | Illustrative positions, telemetry freshness, alert responses, clinical and reproductive records, nutrition and water summaries. |
+| Planning | Monthly calendar, agenda, campaign scheduling, per-animal applications, reminders and withdrawal warnings. |
+| Devices | Inventory, connection/battery status, assignment history and confirmed collar release. |
+| Overview and reports | Indicators derived from context snapshots, campaign progress, CSV export and a print-friendly report. |
+| Plans | Provisional annual estimates, capacity validation and a demo-only activation without financial data. |
+
+Fixtures and mutation rules are scoped to the selected herd. Veterinary inventory and planning are read-only. The overview reads shared root adapters; full cross-context event synchronization and real entitlements are reserved for backend integration.
+
+Browser checks cover public pages, checkout, every sidebar destination, role/herd/language changes, animal uniqueness, alert responses, mobile layout and WCAG-tagged automated accessibility checks. Automated accessibility checks complement, not replace, manual keyboard and visual review.
+
 ## Collaboration
 
 Create short-lived `feature/<kebab-case-name>` branches from `main`; integrate shared foundations before dependent modules. Use English Conventional Commits, one changed file per commit as agreed for this implementation, and pull requests to `main`. Integration merge commits are separate from file-level implementation commits.
 
 Do not commit dependencies, generated builds, test output, credentials or tokens. Keep the lockfile versioned. GitHub Actions checks types, production compilation and browser behavior.
+
+The implementation is split into shared foundation, seven feature branches and `feature/app-integration` for routing, composition and cross-feature checks. Review the foundation first, then features, then integration. PRs are not merged automatically.
