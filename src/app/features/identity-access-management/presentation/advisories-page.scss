@@ -5,6 +5,7 @@
 
 .page-lead strong { color: var(--forest, #33513e); }
 .advisory-table-scroll { min-width: 0; }
+.advisory-table-scroll:focus-visible { outline: 3px solid var(--forest, #33513e); outline-offset: 3px; }
 .advisory-table { min-width: 760px; }
 .advisory-name, .advisory-table tbody th .text-muted { display: block; }
 .advisory-table tbody th .text-muted { margin-top: 4px; font-size: .8rem; }
