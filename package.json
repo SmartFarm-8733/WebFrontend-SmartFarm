@@ -13,7 +13,11 @@
   "scripts": {
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "build:compat": "ng run smartfarm-web:build-compat",
+    "start:compat": "ng run smartfarm-web:serve-compat",
+    "typecheck": "ngc -p tsconfig.check.json --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@angular/cdk": "22.2.2",
