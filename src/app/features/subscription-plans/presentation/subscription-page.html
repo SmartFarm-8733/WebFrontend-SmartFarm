@@ -1,0 +1,106 @@
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">{{ locale.text('Subscription plans', 'Planes de suscripción') }}</span>
+    <h1>{{ locale.text('Choose a plan for your herd', 'Elige un plan para tu hato') }}</h1>
+    <p class="page-lead">{{ locale.text('Compare annual plan examples by herd size and coverage.', 'Compara ejemplos de planes anuales según el tamaño y la cobertura del hato.') }}</p>
+  </div>
+</header>
+
+<p class="notice plan-disclaimer" role="note">
+  {{ locale.text('Names and rates are provisional examples from the supplied mockup, not validated commercial offers. Plan selection in this demo does not enable features or device access.', 'Los nombres y tarifas son ejemplos provisionales del mockup, no ofertas comerciales validadas. Elegir un plan en esta demo no habilita funciones ni acceso a dispositivos.') }}
+</p>
+
+@if (workspace.role() === 'veterinarian') {
+  <p class="notice role-note" role="status">
+    {{ locale.text('The Establishment plan is preselected for a professional-role comparison only. It does not grant veterinary access or entitlements.', 'El plan Establecimiento se preselecciona solo para comparar el rol profesional. No concede acceso veterinario ni habilita prestaciones.') }}
+  </p>
+}
+
+<section class="panel estimate-panel" aria-labelledby="estimate-title">
+  <div class="panel-head">
+    <div>
+      <h2 id="estimate-title">{{ locale.text('Estimate for your herd', 'Estimación para tu hato') }}</h2>
+      <p class="text-muted">{{ locale.text('The mockup example uses 200 heads. Adjust this demo estimate.', 'El ejemplo del mockup usa 200 cabezas. Ajusta esta estimación de prueba.') }}</p>
+    </div>
+  </div>
+  <div class="panel-body">
+    <form [formGroup]="estimateForm" novalidate>
+      <div class="field head-count-field">
+        <label for="plan-head-count">{{ locale.text('Estimated herd size', 'Tamaño estimado del hato') }}</label>
+        <input id="plan-head-count" type="number" min="1" step="1" inputmode="numeric"
+          formControlName="headCount" [attr.aria-invalid]="estimateForm.controls.headCount.touched && estimateForm.controls.headCount.invalid"
+          aria-describedby="plan-head-count-help plan-head-count-error">
+        <span id="plan-head-count-help" class="text-muted">{{ locale.text('Used only to calculate a sample annual amount.', 'Se usa solo para calcular un monto anual de ejemplo.') }}</span>
+        <p class="form-error" id="plan-head-count-error" role="alert">
+          @if (estimateForm.controls.headCount.touched && estimateForm.controls.headCount.invalid) {
+            {{ locale.text('Enter a positive whole number of heads.', 'Ingresa un número entero positivo de cabezas.') }}
+          }
+        </p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="plan-grid" [attr.aria-label]="locale.text('Annual plan comparison', 'Comparación de planes anuales')">
+  @for (plan of facade.plans(); track plan.id) {
+    <article class="panel plan-card" [class.plan-featured]="plan.id === facade.preferredPlanId()">
+      <div class="plan-card-heading">
+        <div>
+          <p class="eyebrow">{{ locale.text('Annual plan', 'Plan anual') }}</p>
+          <h2>{{ planName(plan.id) }}</h2>
+        </div>
+        @if (plan.id === facade.preferredPlanId()) {
+          <span class="badge neutral">{{ locale.text('Role comparison', 'Comparación por rol') }}</span>
+        }
+      </div>
+
+      <p class="plan-rate">
+        <strong>{{ rateLabel(plan.annualRatePerHead) }}</strong>
+        <span>{{ locale.text('/ head / year', '/ cabeza / año') }}</span>
+      </p>
+      <p class="plan-head-limit">{{ headLimitLabel(plan.id) }}</p>
+
+      <ul class="plan-coverage">
+        @for (code of plan.coverage; track code) {
+          <li>{{ coverageLabel(code) }}</li>
+        }
+      </ul>
+
+      <dl class="plan-limits">
+        <div>
+          <dt>{{ locale.text('Device limit', 'Límite de dispositivos') }}</dt>
+          <dd>{{ deviceLimitLabel() }}</dd>
+        </div>
+      </dl>
+
+      @if (estimate(plan.id); as quote) {
+        @if (quote.withinHeadLimit) {
+          <p class="plan-estimate">
+            <span>{{ locale.text('Illustrative annual estimate', 'Estimación anual ilustrativa') }}</span>
+            <strong>S/ {{ locale.number(quote.annualAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</strong>
+          </p>
+        } @else {
+          <p class="form-error capacity-message" role="status">
+            {{ locale.text('This estimate exceeds the plan limit. Compare the ', 'Esta estimación supera el límite del plan. Compara el plan ') }}
+            <strong>{{ quote.suggestedPlanId ? planName(quote.suggestedPlanId) : locale.text('next plan', 'siguiente') }}</strong>.
+          </p>
+        }
+      }
+
+      <button mat-flat-button class="btn" [class.primary]="plan.id === facade.preferredPlanId()"
+        [class.secondary]="plan.id !== facade.preferredPlanId()" type="button"
+        [disabled]="!estimate(plan.id)?.withinHeadLimit" (click)="choosePlan(plan.id)">
+        {{ locale.text('Choose plan', 'Elegir plan') }}
+      </button>
+    </article>
+  }
+</section>
+
+@if (facade.latestDemoActivation(); as activation) {
+  <p class="notice previous-activation" role="status">
+    {{ locale.text('Last simulated selection: ', 'Última selección simulada: ') }}
+    <strong>{{ planName(activation.planId) }}</strong> · {{ activation.headCount }}
+    {{ locale.text('heads on ', 'cabezas el ') }}{{ locale.date(activation.activatedAt) }}.
+    {{ locale.text('No plan entitlements were changed.', 'No se modificaron prestaciones del plan.') }}
+  </p>
+}
