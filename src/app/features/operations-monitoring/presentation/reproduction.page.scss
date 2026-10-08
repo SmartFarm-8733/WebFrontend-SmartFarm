@@ -1,0 +1,36 @@
+:host { display: grid; gap: 1.35rem; min-width: 0; color: var(--ink, #27271f); font-family: 'Plus Jakarta Sans', sans-serif; }
+h1, h2, h3, .stat-value { font-family: Outfit, sans-serif; }
+h1 { margin: .35rem 0; }
+h2 { margin: 0; font-size: 1.15rem; }
+h3 { margin: .5rem 0 0; font-size: 1rem; line-height: 1.4; }
+.page-heading, .panel-head { flex-wrap: wrap; gap: .9rem; }
+.page-lead, .panel-head .text-muted { max-width: 68ch; }
+.split-grid.reproduction-layout { grid-template-columns: minmax(18rem, .82fr) minmax(0, 1.18fr); align-items: start; }
+.reproduction-guidance, .record-feedback { margin: 0; }
+.feedback-error { color: #8a3029; border-color: #a4463c; }
+.reproduction-form { display: grid; gap: 1rem; }
+.field { min-width: 0; }
+textarea { display: block; width: 100%; min-height: 7rem; padding: .7rem .8rem; resize: vertical; border: 1px solid var(--border, #e1ded4); border-radius: 3px; color: var(--ink, #27271f); background: #fff; font: inherit; line-height: 1.5; }
+.field .text-muted, .field .form-error { display: block; margin-top: .4rem; font-size: .82rem; }
+.form-error { color: #8a3029; }
+.save-record { justify-self: start; min-height: 44px; }
+.history-filters { display: flex; flex-wrap: wrap; align-items: end; gap: .8rem; padding: 0 1.4rem 1rem; }
+.history-filters .field { min-width: min(100%, 10rem); flex: 1; }
+.history-filters button { min-height: 44px; }
+.reproductive-record-list { list-style: none; margin: 0; padding: 0; }
+.reproductive-record-list > li + li { border-top: 1px solid var(--border, #e1ded4); }
+.reproductive-record { padding: 1rem 0; }
+.record-heading { display: flex; justify-content: space-between; align-items: start; gap: .9rem; }
+.record-heading > div { min-width: 0; }
+.record-heading time, .record-author { color: var(--muted, #68695e); font-size: .82rem; }
+.record-heading time { flex: 0 0 auto; text-align: right; }
+.record-note { margin: .75rem 0; line-height: 1.65; }
+.record-author { margin: .75rem 0 0; }
+:focus-visible { outline: 3px solid var(--gold, #e4b842); outline-offset: 3px; }
+@media (max-width: 980px) { .split-grid.reproduction-layout { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .history-filters { padding: 0 1rem 1rem; }
+  .history-filters .field { min-width: 0; flex-basis: 100%; }
+  .record-heading { display: grid; }
+  .record-heading time { text-align: left; }
+}

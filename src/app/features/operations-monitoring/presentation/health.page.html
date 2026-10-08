@@ -1,0 +1,157 @@
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">{{ locale.text('CARE RECORDS / ICHU', 'REGISTROS DE ATENCIÓN / ICHU') }}</span>
+    <h1>{{ locale.text('Clinical history', 'Historial clínico') }}</h1>
+    <p class="page-lead">{{ facade.workspace.herdName() }} · {{ locale.text('Field observations and veterinary records, in capture order', 'Observaciones de campo y registros veterinarios, por hora de captura') }}</p>
+  </div>
+  <span class="badge neutral">{{ locale.text('Demo records · local only', 'Registros de demo · solo locales') }}</span>
+</header>
+
+<section class="stats-grid" [attr.aria-label]="locale.text('Health record overview', 'Resumen del historial clínico')">
+  <div class="stat featured"><span class="stat-label">{{ locale.text('Health records', 'Registros de salud') }}</span><strong class="stat-value">{{ locale.number(facade.healthRecords().length) }}</strong><span class="stat-note">{{ locale.text('In this herd demo', 'En esta demo del hato') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Animals under withdrawal', 'Animales en periodo de retiro') }}</span><strong class="stat-value">{{ locale.number(activeWithdrawalAnimals()) }}</strong><span class="stat-note">{{ locale.text('Based on recorded sample dates', 'Según las fechas de muestra registradas') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Role', 'Rol') }}</span><strong class="stat-value role-value">{{ facade.workspace.role() === 'veterinarian' ? locale.text('Veterinarian', 'Veterinario') : locale.text('Rancher', 'Ganadero') }}</strong><span class="stat-note">{{ locale.text('Available record types follow this demo role', 'Los tipos de registro disponibles dependen del rol de demo') }}</span></div>
+</section>
+
+@if (facade.feedback(); as feedback) {
+  <p class="notice record-feedback" [class.feedback-error]="feedbackIsError()" [attr.role]="feedbackIsError() ? 'alert' : 'status'" aria-live="polite">{{ facade.copy(feedback) }}</p>
+}
+
+<div class="split-grid health-layout">
+  <section class="panel" aria-labelledby="health-entry-title">
+    <div class="panel-head"><div><h2 id="health-entry-title">{{ locale.text('Record a care event', 'Registrar un evento de atención') }}</h2><p class="text-muted">{{ locale.text('This demo does not diagnose or prescribe treatment.', 'Esta demo no diagnostica ni prescribe tratamientos.') }}</p></div></div>
+    <div class="panel-body">
+      <p class="notice role-guidance">
+        @if (facade.workspace.role() === 'veterinarian') {
+          {{ locale.text('Veterinary entries are illustrative. Verify products, doses and withdrawal requirements through your clinical process.', 'Los registros veterinarios son ilustrativos. Verifica productos, dosis y periodos de retiro según tu proceso clínico.') }}
+        } @else {
+          {{ locale.text('Field notes document what was observed. They are not a diagnosis or a clinical intervention.', 'Las notas de campo documentan lo observado. No son un diagnóstico ni una intervención clínica.') }}
+        }
+      </p>
+
+      <form class="care-form" [formGroup]="recordForm" (ngSubmit)="saveRecord()" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="health-animal">{{ locale.text('Animal', 'Animal') }}</label>
+            <select id="health-animal" formControlName="animalId" required [attr.aria-invalid]="recordForm.controls.animalId.invalid && recordForm.controls.animalId.touched ? 'true' : null">
+              <option value="">{{ locale.text('Select an animal', 'Selecciona un animal') }}</option>
+              @for (animal of facade.animals(); track animal.id) { <option [value]="animal.id">{{ animal.id }} · {{ animal.name }}</option> }
+            </select>
+            @if (recordForm.controls.animalId.invalid && recordForm.controls.animalId.touched) { <span class="form-error" role="alert">{{ locale.text('Select an animal from this herd.', 'Selecciona un animal de este hato.') }}</span> }
+          </div>
+
+          <div class="field">
+            <label for="health-kind">{{ locale.text('Record type', 'Tipo de registro') }}</label>
+            <select id="health-kind" formControlName="kind">
+              @for (kind of availableKinds(); track kind) { <option [value]="kind">{{ facade.kindLabel(kind) }}</option> }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="health-date">{{ locale.text('Date of event', 'Fecha del evento') }}</label>
+            <input id="health-date" type="date" formControlName="occurredAt" [max]="maximumDay" required [attr.aria-invalid]="recordForm.controls.occurredAt.invalid && recordForm.controls.occurredAt.touched ? 'true' : null" />
+            @if (recordForm.controls.occurredAt.hasError('calendarDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a real calendar date.', 'Escribe una fecha de calendario válida.') }}</span> }
+            @if (recordForm.controls.occurredAt.hasError('futureDay') && recordForm.controls.occurredAt.touched) { <span class="form-error" role="alert">{{ locale.text('The date cannot be after the demo date.', 'La fecha no puede ser posterior a la fecha de demo.') }}</span> }
+          </div>
+
+          <div class="field field-wide">
+            <label for="health-note">{{ locale.text('Observation or clinical note', 'Observación o nota clínica') }}</label>
+            <textarea id="health-note" formControlName="note" rows="4" minlength="5" maxlength="500" required [attr.aria-invalid]="recordForm.controls.note.invalid && recordForm.controls.note.touched ? 'true' : null" [attr.aria-describedby]="recordForm.controls.note.invalid && recordForm.controls.note.touched ? 'health-note-hint health-note-error' : 'health-note-hint'"></textarea>
+            <span id="health-note-hint" class="text-muted">{{ locale.text('5–500 characters. Describe the observation or recorded action.', 'De 5 a 500 caracteres. Describe la observación o acción registrada.') }}</span>
+            @if (recordForm.controls.note.invalid && recordForm.controls.note.touched) { <span id="health-note-error" class="form-error" role="alert">{{ locale.text('Enter a note between 5 and 500 characters.', 'Escribe una nota de 5 a 500 caracteres.') }}</span> }
+          </div>
+
+          @if (requiresWithdrawal()) {
+            <fieldset class="field-wide medication-fields">
+              <legend>{{ locale.text('Product and withdrawal record', 'Registro del producto y retiro') }}</legend>
+              <p class="text-muted">{{ locale.text('Enter the recorded details. The demo does not calculate a veterinary dose.', 'Ingresa los datos registrados. La demo no calcula dosis veterinarias.') }}</p>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="health-product">{{ locale.text('Product', 'Producto') }}</label>
+                  <input id="health-product" type="text" formControlName="product" maxlength="80" required [attr.aria-invalid]="recordForm.controls.product.invalid && recordForm.controls.product.touched ? 'true' : null" />
+                  @if (recordForm.controls.product.invalid && recordForm.controls.product.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a product name (up to 80 characters).', 'Ingresa el nombre del producto (hasta 80 caracteres).') }}</span> }
+                </div>
+                <div class="field">
+                  <label for="health-dose">{{ locale.text('Dose as recorded', 'Dosis registrada') }}</label>
+                  <input id="health-dose" type="text" formControlName="dose" maxlength="80" required [attr.aria-invalid]="recordForm.controls.dose.invalid && recordForm.controls.dose.touched ? 'true' : null" />
+                  @if (recordForm.controls.dose.invalid && recordForm.controls.dose.touched) { <span class="form-error" role="alert">{{ locale.text('Enter the recorded dose (up to 80 characters).', 'Ingresa la dosis registrada (hasta 80 caracteres).') }}</span> }
+                </div>
+                <div class="field">
+                  <label for="withdrawal-start">{{ locale.text('Withdrawal starts', 'Inicio del retiro') }}</label>
+                  <input id="withdrawal-start" type="date" formControlName="withdrawalStart" [max]="maximumDay" required />
+                  @if (recordForm.controls.withdrawalStart.invalid && recordForm.controls.withdrawalStart.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a valid date no later than the demo date.', 'Ingresa una fecha válida hasta la fecha de demo.') }}</span> }
+                  @if (recordForm.hasError('withdrawalBeforeRecord')) { <span class="form-error" role="alert">{{ locale.text('Withdrawal must start on or after the event date.', 'El retiro debe iniciar el día del evento o después.') }}</span> }
+                </div>
+                <div class="field">
+                  <label for="withdrawal-end">{{ locale.text('Withdrawal ends', 'Fin del retiro') }}</label>
+                  <input id="withdrawal-end" type="date" formControlName="withdrawalEnd" required />
+                  @if (recordForm.controls.withdrawalEnd.invalid && recordForm.controls.withdrawalEnd.touched) { <span class="form-error" role="alert">{{ locale.text('Enter a valid calendar date.', 'Ingresa una fecha de calendario válida.') }}</span> }
+                  @if (recordForm.hasError('withdrawalEndBeforeStart')) { <span class="form-error" role="alert">{{ locale.text('Withdrawal cannot end before it starts.', 'El retiro no puede terminar antes de iniciar.') }}</span> }
+                </div>
+                <div class="field">
+                  <label for="withdrawal-target">{{ locale.text('Production affected', 'Producción afectada') }}</label>
+                  <select id="withdrawal-target" formControlName="withdrawalTarget">
+                    <option value="milk">{{ locale.text('Milk', 'Leche') }}</option>
+                    <option value="meat">{{ locale.text('Meat', 'Carne') }}</option>
+                    <option value="both">{{ locale.text('Milk and meat', 'Leche y carne') }}</option>
+                  </select>
+                </div>
+                <label class="review-check field-wide" for="withdrawal-reviewed">
+                  <input id="withdrawal-reviewed" type="checkbox" formControlName="withdrawalReviewed" />
+                  <span>{{ locale.text('I reviewed any overlapping withdrawal period for this same product.', 'Revisé los periodos de retiro superpuestos de este mismo producto.') }}</span>
+                </label>
+              </div>
+            </fieldset>
+          }
+        </div>
+
+        <button class="btn primary save-record" type="submit">{{ locale.text('Save demo record', 'Guardar registro de demo') }}</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="panel history-panel" aria-labelledby="health-history-title">
+    <div class="panel-head"><div><h2 id="health-history-title">{{ locale.text('Health history', 'Historial de salud') }}</h2><p class="text-muted">{{ locale.text('Event time is shown; synchronization is not represented here.', 'Se muestra la hora del evento; aquí no se representa la sincronización.') }}</p></div></div>
+    <form class="toolbar history-filters" [formGroup]="filters" [attr.aria-label]="locale.text('Filter health history', 'Filtrar historial de salud')">
+      <div class="field">
+        <label for="history-animal">{{ locale.text('Animal', 'Animal') }}</label>
+        <select id="history-animal" formControlName="animal">
+          <option value="">{{ locale.text('All animals', 'Todos los animales') }}</option>
+          @for (animal of facade.animals(); track animal.id) { <option [value]="animal.id">{{ animal.id }} · {{ animal.name }}</option> }
+        </select>
+      </div>
+      <div class="field">
+        <label for="history-kind">{{ locale.text('Record type', 'Tipo de registro') }}</label>
+        <select id="history-kind" formControlName="kind">
+          <option value="">{{ locale.text('All record types', 'Todos los tipos') }}</option>
+          <option value="observation">{{ facade.kindLabel('observation') }}</option>
+          <option value="treatment">{{ facade.kindLabel('treatment') }}</option>
+          <option value="vaccination">{{ facade.kindLabel('vaccination') }}</option>
+          <option value="review">{{ facade.kindLabel('review') }}</option>
+        </select>
+      </div>
+      <button class="btn secondary" type="button" (click)="clearFilters()">{{ locale.text('Clear filters', 'Limpiar filtros') }}</button>
+    </form>
+
+    <div class="panel-body">
+      <ol class="care-record-list">
+        @for (record of healthRecords(); track record.id) {
+          <li>
+            <article class="care-record">
+              <header class="record-heading">
+                <div><span class="badge neutral">{{ facade.kindLabel(record.kind) }}</span><h3><span class="mono">{{ record.animalId }}</span> · {{ animalName(record.animalId) }}</h3></div>
+                <time [attr.datetime]="record.occurredAt">{{ facade.captured(record.occurredAt) }}</time>
+              </header>
+              <p class="record-note">{{ facade.copy(record.note) }}</p>
+              @if (record.product) { <dl class="record-details"><dt>{{ locale.text('Product and dose', 'Producto y dosis') }}</dt><dd>{{ record.product }} · {{ record.dose }}</dd></dl> }
+              @if (record.withdrawalStart && record.withdrawalEnd) { <p class="withdrawal-note"><span class="badge warning">{{ locale.text('Withdrawal', 'Retiro') }}</span> {{ facade.day(record.withdrawalStart) }} – {{ facade.day(record.withdrawalEnd) }} · {{ withdrawalTargetLabel(record.withdrawalTarget) }}</p> }
+              <p class="record-author text-muted">{{ facade.author(record.author) }}</p>
+            </article>
+          </li>
+        } @empty {
+          <li class="empty-state" role="status">{{ locale.text('No health records match. Clear filters or select another animal.', 'No hay registros coincidentes. Limpia los filtros o elige otro animal.') }}</li>
+        }
+      </ol>
+    </div>
+  </section>
+</div>
