@@ -1,0 +1,123 @@
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">{{ locale.text('Herd access', 'Acceso al hato') }}</span>
+    <h1>{{ locale.text('Advisories', 'Asesorías') }}</h1>
+    <p class="page-lead">
+      {{ locale.text('Review veterinary access to', 'Revisa el acceso veterinario a') }}
+      <strong>{{ workspace.herdName() }}</strong>.
+      {{ locale.text('Permissions apply to this herd and can expire or be revoked.', 'Los permisos corresponden a este hato y pueden vencer o revocarse.') }}
+    </p>
+  </div>
+  <a mat-button class="btn secondary" routerLink="/account">{{ locale.text('View profile', 'Ver perfil') }}</a>
+</header>
+
+<section class="stats-grid" [attr.aria-label]="locale.text('Advisory overview', 'Resumen de asesorías')">
+  <article class="stat featured">
+    <span class="stat-label">{{ locale.text('Your herd access', 'Tu acceso al hato') }}</span>
+    <strong class="stat-value">{{ facade.hasHerdAccess() ? locale.text('Granted', 'Concedido') : locale.text('Not active', 'Sin vigencia') }}</strong>
+    <span class="stat-note">{{ workspace.herdName() }}</span>
+  </article>
+  <article class="stat">
+    <span class="stat-label">{{ locale.text('Active advisories', 'Asesorías activas') }}</span>
+    <strong class="stat-value">{{ facade.activeCount() }}</strong>
+    <span class="stat-note">{{ locale.text('Current for this herd', 'Vigentes para este hato') }}</span>
+  </article>
+  @if (facade.canManage()) {
+    <article class="stat">
+      <span class="stat-label">{{ locale.text('Requests to review', 'Solicitudes por revisar') }}</span>
+      <strong class="stat-value">{{ facade.pendingCount() }}</strong>
+      <span class="stat-note">{{ locale.text('Awaiting your decision', 'Esperan tu decisión') }}</span>
+    </article>
+  }
+</section>
+
+@if (!facade.canManage()) {
+  @if (facade.hasHerdAccess()) {
+    <p class="notice" role="status">
+      {{ locale.text('You have an active advisory for this herd. Access ends if it expires or the herd administrator revokes it.', 'Tienes una asesoría vigente para este hato. El acceso termina si vence o si el administrador lo revoca.') }}
+    </p>
+  } @else {
+    <p class="notice" role="status">
+      {{ locale.text('There is no active advisory for this herd. Ask its administrator to grant access; requesting access is not enabled in this demo.', 'No hay una asesoría vigente para este hato. Pide acceso a su administrador; solicitarlo no está habilitado en esta demo.') }}
+    </p>
+  }
+}
+
+<section class="panel" aria-labelledby="advisories-list-title">
+  <div class="panel-head">
+    <div>
+      <h2 id="advisories-list-title">{{ locale.text('Access records', 'Registros de acceso') }}</h2>
+      <p class="text-muted">{{ locale.text('Requests and decisions for the selected herd.', 'Solicitudes y decisiones del hato seleccionado.') }}</p>
+    </div>
+    <span class="badge neutral">{{ workspace.herdName() }}</span>
+  </div>
+  <div class="panel-body">
+    @if (actionResult(); as result) {
+      <p class="notice" [attr.role]="result === 'updated' ? 'status' : 'alert'">{{ actionMessage(result) }}</p>
+    }
+
+    @if (facade.advisories().length === 0) {
+      <div class="empty-state">
+        <h3>{{ locale.text('No advisory records yet', 'Aún no hay registros de asesoría') }}</h3>
+        @if (facade.canManage()) {
+          <p>{{ locale.text('New veterinary access requests will appear here for review.', 'Las nuevas solicitudes de acceso veterinario aparecerán aquí para que las revises.') }}</p>
+        } @else {
+          <p>{{ locale.text('When the herd administrator grants access, its status will appear here.', 'Cuando el administrador del hato conceda acceso, aquí aparecerá su estado.') }}</p>
+        }
+      </div>
+    } @else {
+      <div class="table-scroll advisory-table-scroll" role="region" tabindex="0"
+        [attr.aria-label]="locale.text('Advisory records for ', 'Registros de asesoría de ') + workspace.herdName()">
+        <table class="data-table advisory-table">
+          <caption class="visually-hidden">{{ locale.text('Veterinary advisory access records for the selected herd', 'Registros de acceso veterinario al hato seleccionado') }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{{ locale.text('Veterinarian', 'Veterinario') }}</th>
+              <th scope="col">{{ locale.text('Specialty', 'Especialidad') }}</th>
+              <th scope="col">{{ locale.text('Requested', 'Solicitada') }}</th>
+              <th scope="col">{{ locale.text('Access until', 'Acceso hasta') }}</th>
+              <th scope="col">{{ locale.text('Status', 'Estado') }}</th>
+              @if (facade.canManage()) {
+                <th scope="col">{{ locale.text('Actions', 'Acciones') }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (advisory of facade.advisories(); track advisory.id) {
+              <tr>
+                <th scope="row">
+                  <span class="advisory-name">{{ advisory.name }}</span>
+                  <span class="text-muted mono">{{ advisory.license }}</span>
+                </th>
+                <td>{{ specialtyLabel(advisory.specialty) }}</td>
+                <td>{{ locale.date(advisory.requestedAt, { dateStyle: 'medium' }) }}</td>
+                <td>{{ advisory.expiresAt ? locale.date(advisory.expiresAt, { dateStyle: 'medium' }) : locale.text('No expiry', 'Sin vencimiento') }}</td>
+                <td><span class="badge" [class.success]="statusTone(advisory.status) === 'success'" [class.warning]="statusTone(advisory.status) === 'warning'" [class.danger]="statusTone(advisory.status) === 'danger'" [class.neutral]="statusTone(advisory.status) === 'neutral'">{{ statusLabel(advisory.status) }}</span></td>
+                @if (facade.canManage()) {
+                  <td>
+                    <div class="advisory-actions">
+                      @if (advisory.status === 'pending') {
+                        <button mat-flat-button class="btn primary" type="button" [attr.aria-label]="locale.text('Approve request from ', 'Aprobar solicitud de ') + advisory.name" (click)="changeAdvisory(advisory.id, 'accept')">{{ locale.text('Approve', 'Aprobar') }}</button>
+                        <button mat-button class="btn secondary" type="button" [attr.aria-label]="locale.text('Decline request from ', 'Rechazar solicitud de ') + advisory.name" (click)="changeAdvisory(advisory.id, 'reject')">{{ locale.text('Decline', 'Rechazar') }}</button>
+                      } @else if (advisory.status === 'active') {
+                        <button mat-button class="btn danger" type="button" [attr.aria-label]="locale.text('Revoke access for ', 'Revocar acceso de ') + advisory.name" (click)="changeAdvisory(advisory.id, 'revoke')">{{ locale.text('Revoke access', 'Revocar acceso') }}</button>
+                      } @else {
+                        <span class="text-muted">{{ locale.text('No action available', 'Sin acciones disponibles') }}</span>
+                      }
+                    </div>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (facade.canManage()) {
+      <p class="text-muted advisory-footnote">
+        {{ locale.text('Approving grants access until the date shown. Revoking ends future access; previously authored clinical records remain part of the history.', 'Aprobar concede acceso hasta la fecha indicada. Revocar termina el acceso futuro; los registros clínicos previos conservan su autoría en el historial.') }}
+      </p>
+    }
+  </div>
+</section>

@@ -1,0 +1,88 @@
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">{{ locale.text('Your account', 'Tu cuenta') }}</span>
+    <h1>{{ locale.text('Profile', 'Perfil') }}</h1>
+    <p class="page-lead">{{ locale.text('Keep your team’s contact details close.', 'Ten a mano los datos de contacto de tu equipo.') }}</p>
+  </div>
+  <a mat-button class="btn secondary" routerLink="/advisories">{{ locale.text('Manage advisories', 'Gestionar asesorías') }}</a>
+</header>
+<div class="split-grid">
+  <section class="panel" aria-labelledby="profile-details-title">
+    <div class="panel-head"><h2 id="profile-details-title">{{ locale.text('Contact details', 'Datos de contacto') }}</h2><span class="badge neutral">{{ locale.text('Demo profile', 'Perfil de prueba') }}</span></div>
+    <div class="panel-body">
+      @if (discardedDraft()) { <p class="notice" role="status">{{ locale.text('The workspace changed. The form now shows this herd’s profile; unsaved edits were cleared.', 'Cambió el espacio de trabajo. El formulario muestra el perfil de este hato; los cambios sin guardar se borraron.') }}</p> }
+      <form class="stack" [formGroup]="form" (ngSubmit)="save()" novalidate aria-describedby="profile-demo-note">
+        <div class="form-grid">
+          <div class="field">
+            <label for="profile-name">{{ locale.text('Full name', 'Nombre completo') }}</label>
+            <input id="profile-name" formControlName="name" type="text" autocomplete="name" maxlength="80" [attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid" aria-describedby="profile-name-error">
+            <p class="form-error" id="profile-name-error">@if (form.controls.name.touched && form.controls.name.invalid) { {{ locale.text('Enter 2–80 characters without surrounding spaces.', 'Ingresa entre 2 y 80 caracteres sin espacios al inicio o al final.') }} }</p>
+          </div>
+          <div class="field">
+            <label for="profile-email">{{ locale.text('Email', 'Correo') }}</label>
+            <input id="profile-email" formControlName="email" type="email" autocomplete="email" maxlength="120" [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid" aria-describedby="profile-email-error">
+            <p class="form-error" id="profile-email-error">@if (form.controls.email.touched && form.controls.email.invalid) { {{ locale.text('Enter a valid email.', 'Ingresa un correo válido.') }} }</p>
+          </div>
+          <div class="field">
+            <label for="profile-region">{{ locale.text('Region', 'Región') }}</label>
+            <select id="profile-region" formControlName="region" [attr.aria-invalid]="form.controls.region.touched && form.controls.region.invalid" aria-describedby="profile-region-error">
+              <option value="Junín">{{ locale.text('Junín', 'Junín') }}</option>
+              <option value="Puno">{{ locale.text('Puno', 'Puno') }}</option>
+              <option value="Cusco">{{ locale.text('Cusco', 'Cusco') }}</option>
+              <option value="other">{{ locale.text('Other region', 'Otra región') }}</option>
+            </select>
+            <p class="form-error" id="profile-region-error">@if (form.controls.region.touched && form.controls.region.invalid) { {{ locale.text('Choose your region.', 'Elige tu región.') }} }</p>
+          </div>
+        </div>
+        @if (workspace.role() === 'veterinarian') {
+          <h3>{{ locale.text('Professional profile', 'Perfil profesional') }}</h3>
+          <p class="text-muted">{{ locale.text('These are sample credentials. Saving them does not verify your license or grant herd access.', 'Estas son credenciales de ejemplo. Guardarlas no verifica tu colegiatura ni concede acceso a un hato.') }}</p>
+          <div class="form-grid">
+            <div class="field">
+              <label for="profile-specialty">{{ locale.text('Specialty', 'Especialidad') }}</label>
+              <select id="profile-specialty" formControlName="specialty" [attr.aria-invalid]="form.controls.specialty.touched && form.controls.specialty.invalid" aria-describedby="profile-specialty-error">
+                <option value="herd-health">{{ locale.text('Herd health', 'Sanidad del hato') }}</option>
+                <option value="reproduction">{{ locale.text('Reproduction', 'Reproducción') }}</option>
+                <option value="nutrition">{{ locale.text('Nutrition', 'Nutrición') }}</option>
+                <option value="other">{{ locale.text('Other specialty', 'Otra especialidad') }}</option>
+              </select>
+              <p class="form-error" id="profile-specialty-error">@if (form.controls.specialty.touched && form.controls.specialty.invalid) { {{ locale.text('Choose a specialty.', 'Elige una especialidad.') }} }</p>
+            </div>
+            <div class="field">
+              <label for="profile-license">{{ locale.text('Demo license number', 'Colegiatura de prueba') }}</label>
+              <input id="profile-license" formControlName="license" type="text" maxlength="11" [attr.aria-invalid]="(form.controls.license.touched && form.controls.license.invalid) || status() === 'duplicate-license'" aria-describedby="profile-license-error">
+              <p class="form-error" id="profile-license-error">@if (form.controls.license.touched && form.controls.license.invalid) { {{ locale.text('Use CMVP- followed by 4–6 digits.', 'Usa CMVP- seguido de 4 a 6 dígitos.') }} @if (status() === 'duplicate-license') { {{ locale.text('That license belongs to another sample profile.', 'Esa colegiatura pertenece a otro perfil de ejemplo.') }} }</p>
+            </div>
+            <div class="field">
+              <label for="profile-experience">{{ locale.text('Years of experience', 'Años de experiencia') }}</label>
+              <input id="profile-experience" formControlName="experience" type="number" min="0" max="60" step="1" [attr.aria-invalid]="form.controls.experience.touched && form.controls.experience.invalid" aria-describedby="profile-experience-error">
+              <p class="form-error" id="profile-experience-error">@if (form.controls.experience.touched && form.controls.experience.invalid) { {{ locale.text('Enter a whole number from 0 to 60.', 'Ingresa un número entero entre 0 y 60.') }} }</p>
+            </div>
+          </div>
+        }
+        <div class="toolbar">
+          <button mat-flat-button class="btn primary" type="submit">{{ locale.text('Save demo profile', 'Guardar perfil de prueba') }}</button>
+          <button mat-button class="btn secondary" type="button" [disabled]="!form.dirty" (click)="reset()">{{ locale.text('Discard edits', 'Descartar cambios') }}</button>
+        </div>
+        @if (status() === 'saved') { <p class="notice" role="status">{{ locale.text('Profile saved in this demo. Reloading resets it.', 'Perfil guardado en esta demo. Se reinicia al recargar.') }}</p> }
+        @if (status() === 'invalid') { <p class="form-error" role="alert">{{ locale.text('Check the fields. Use a full email address with a domain.', 'Revisa los campos. Usa un correo completo con dominio.') }}</p> }
+        <p id="profile-demo-note" class="text-muted">{{ locale.text('Changes stay in memory for this herd and role. Use sample details.', 'Los cambios se guardan en memoria para este hato y rol. Usa datos de ejemplo.') }}</p>
+      </form>
+    </div>
+  </section>
+  <aside class="panel" aria-labelledby="account-access-title">
+    <div class="panel-head"><h2 id="account-access-title">{{ locale.text('Your workspace', 'Tu espacio de trabajo') }}</h2></div>
+    <div class="panel-body">
+      <dl class="account-summary">
+        <div><dt>{{ locale.text('Herd', 'Hato') }}</dt><dd>{{ workspace.herdName() }}</dd></div>
+        <div><dt>{{ locale.text('Role', 'Rol') }}</dt><dd>{{ workspace.role() === 'rancher' ? locale.text('Rancher', 'Ganadero') : locale.text('Veterinarian', 'Veterinario') }}</dd></div>
+        <div><dt>{{ locale.text('Access', 'Acceso') }}</dt><dd>{{ facade.hasHerdAccess() ? locale.text('Available in demo', 'Disponible en la demo') : locale.text('Not authorized', 'Sin autorización') }}</dd></div>
+      </dl>
+      <p class="notice">{{ locale.text('Professional access needs a current herd authorization. Profile edits never grant access.', 'El acceso profesional requiere autorización vigente del hato. Editar el perfil nunca concede acceso.') }}</p>
+      <a mat-button class="btn secondary" routerLink="/plans">{{ locale.text('View demo plans', 'Ver planes de prueba') }}</a>
+      <p class="text-muted" id="password-unavailable">{{ locale.text('Password changes require the future authentication service.', 'Cambiar la contraseña requiere el futuro servicio de autenticación.') }}</p>
+      <button mat-button class="btn secondary" type="button" disabled aria-describedby="password-unavailable">{{ locale.text('Change password', 'Cambiar contraseña') }}</button>
+    </div>
+  </aside>
+</div>
+

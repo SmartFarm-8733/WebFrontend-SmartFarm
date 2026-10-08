@@ -1,0 +1,53 @@
+:host {
+  --iam-forest: #33513e;
+  --iam-gold: #e4b842;
+  --iam-paper: #f6f5f0;
+  --iam-border: #e1ded4;
+  --iam-ink: #27271f;
+  --iam-muted: #68675a;
+  display: block;
+  min-width: 0;
+  color: var(--iam-ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+h1 { font-size: clamp(1.75rem, 4vw, 2rem); line-height: 1.15; }
+p { line-height: 1.65; }
+.field { min-width: 0; }
+.field label { display: block; font-size: .875rem; font-weight: 600; margin-bottom: 8px; }
+.field input, .field select {
+  width: 100%; min-height: 46px; padding: 10px 12px;
+  background: #fff; color: var(--iam-ink); border: 1px solid var(--iam-border);
+  border-radius: 7px; font: inherit; font-size: .875rem;
+}
+:where(button, input, select, a, summary):focus-visible {
+  outline: 3px solid var(--iam-forest); outline-offset: 3px;
+}
+.field [aria-invalid='true'] { border-color: #a4463c; }
+.form-error { color: #90372f; font-size: .8rem; margin: 5px 0 0; }
+.form-error:empty { display: none; }
+.btn { min-height: 44px; white-space: normal; }
+.btn.primary { background: var(--iam-forest); color: #fff; }
+.btn.gold { background: var(--iam-gold); color: #243b2d; }
+.btn.secondary { color: var(--iam-forest); }
+.text-muted { color: var(--iam-muted); }
+.notice { border-left: 3px solid var(--iam-gold); padding: 14px 16px; background: var(--iam-paper); line-height: 1.6; }
+.notice p { margin: 0; }
+.toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.stack { display: grid; gap: 16px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.table-scroll { max-width: 100%; overflow-x: auto; }
+dl { margin: 0; }
+dl > div { display: grid; grid-template-columns: minmax(80px, .4fr) minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--iam-border); }
+dt { color: var(--iam-muted); }
+dd { margin: 0; overflow-wrap: anywhere; }
+.account-summary { margin: 20px 0; }
+.access-confirm { margin-top: 20px; }
+.access-confirm h2 { margin-top: 0; font-size: 1.2rem; }
+.access-note { max-width: 70ch; }
+@media (max-width: 560px) {
+  .form-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .toolbar .btn { flex: 1 1 160px; }
+}
+
