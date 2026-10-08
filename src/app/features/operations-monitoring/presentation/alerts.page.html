@@ -1,0 +1,121 @@
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">{{ locale.text('OPERATIONS / ICHU', 'OPERACIONES / ICHU') }}</span>
+    <h1>{{ locale.text('Alerts', 'Alertas') }}</h1>
+    <p class="page-lead">{{ facade.workspace.herdName() }} · {{ locale.text('Prioritized demo signals with recorded responses', 'Señales de muestra priorizadas con respuestas registradas') }}</p>
+  </div>
+  <span class="badge warning">{{ locale.text('Demo data · no push sent', 'Datos de demo · no se envían notificaciones') }}</span>
+</header>
+
+<section class="stats-grid" [attr.aria-label]="locale.text('Alert overview', 'Resumen de alertas')">
+  <div class="stat featured"><span class="stat-label">{{ locale.text('High priority · unresolved', 'Prioridad alta · sin resolver') }}</span><strong class="stat-value">{{ locale.number(highPriorityCount()) }}</strong><span class="stat-note">{{ locale.text('Signals to review first', 'Señales para revisar primero') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Open', 'Abiertas') }}</span><strong class="stat-value">{{ locale.number(openCount()) }}</strong><span class="stat-note">{{ locale.text('Awaiting a response', 'Pendientes de respuesta') }}</span></div>
+  <div class="stat"><span class="stat-label">{{ locale.text('Acknowledged', 'En atención') }}</span><strong class="stat-value">{{ locale.number(acknowledgedCount()) }}</strong><span class="stat-note">{{ locale.text('May be resolved after review', 'Se pueden resolver tras la revisión') }}</span></div>
+</section>
+
+<form class="toolbar alert-filters" [formGroup]="filters" [attr.aria-label]="locale.text('Filter alerts', 'Filtrar alertas')">
+  <div class="field">
+    <label for="alert-animal">{{ locale.text('Animal', 'Animal') }}</label>
+    <select id="alert-animal" formControlName="animal">
+      <option value="">{{ locale.text('All animals', 'Todos los animales') }}</option>
+      @for (animal of facade.animals(); track animal.id) { <option [value]="animal.id">{{ animal.id }} · {{ animal.name }}</option> }
+    </select>
+  </div>
+  <div class="field">
+    <label for="alert-priority">{{ locale.text('Priority', 'Prioridad') }}</label>
+    <select id="alert-priority" formControlName="priority">
+      <option value="">{{ locale.text('All priorities', 'Todas las prioridades') }}</option>
+      <option value="high">{{ facade.priorityLabel('high') }}</option>
+      <option value="medium">{{ facade.priorityLabel('medium') }}</option>
+      <option value="low">{{ facade.priorityLabel('low') }}</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="alert-category">{{ locale.text('Signal type', 'Tipo de señal') }}</label>
+    <select id="alert-category" formControlName="category">
+      <option value="">{{ locale.text('All types', 'Todos los tipos') }}</option>
+      <option value="temperature">{{ categoryLabel('temperature') }}</option>
+      <option value="activity">{{ categoryLabel('activity') }}</option>
+      <option value="location">{{ categoryLabel('location') }}</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="alert-status">{{ locale.text('Status', 'Estado') }}</label>
+    <select id="alert-status" formControlName="status">
+      <option value="">{{ locale.text('All statuses', 'Todos los estados') }}</option>
+      <option value="open">{{ facade.statusLabel('open') }}</option>
+      <option value="acknowledged">{{ facade.statusLabel('acknowledged') }}</option>
+      <option value="resolved">{{ facade.statusLabel('resolved') }}</option>
+    </select>
+  </div>
+  <button class="btn secondary" type="button" (click)="clearFilters()">{{ locale.text('Clear filters', 'Limpiar filtros') }}</button>
+</form>
+
+@if (facade.feedback(); as feedback) {
+  <p class="notice response-feedback" [class.feedback-error]="feedbackIsError()" [attr.role]="feedbackIsError() ? 'alert' : 'status'" aria-live="polite">{{ facade.copy(feedback) }}</p>
+}
+
+<section class="panel" aria-labelledby="alert-queue-title">
+  <div class="panel-head">
+    <div>
+      <h2 id="alert-queue-title">{{ locale.text('Alert queue', 'Cola de alertas') }}</h2>
+      <p class="text-muted">{{ locale.text('Signals are ordered by priority and capture time. They are not diagnoses.', 'Las señales se ordenan por prioridad y hora de captura. No son diagnósticos.') }}</p>
+    </div>
+    <span class="badge neutral">{{ locale.number(alerts().length) }} {{ locale.text('shown', 'mostradas') }}</span>
+  </div>
+  <div class="panel-body">
+    <ol class="alert-list">
+      @for (alert of alerts(); track alert.id) {
+        <li>
+          <article class="alert-entry" [class.priority-high]="alert.priority === 'high'" [class.priority-medium]="alert.priority === 'medium'">
+            <header class="alert-heading">
+              <div class="alert-title-group">
+                <div class="alert-labels">
+                  <span class="badge" [class.danger]="alert.priority === 'high'" [class.warning]="alert.priority === 'medium'" [class.neutral]="alert.priority === 'low'">{{ facade.priorityLabel(alert.priority) }}</span>
+                  <span class="badge neutral">{{ categoryLabel(alert.category) }}</span>
+                </div>
+                <h3>{{ facade.copy(alert.title) }}</h3>
+                <p class="alert-animal"><span class="mono">{{ alert.animalId }}</span> · {{ animalName(alert.animalId) }}</p>
+              </div>
+              <div class="alert-stamps">
+                <time [attr.datetime]="alert.raisedAt">{{ facade.captured(alert.raisedAt) }}</time>
+                <span class="badge" [class.danger]="alert.status === 'open'" [class.warning]="alert.status === 'acknowledged'" [class.success]="alert.status === 'resolved'">{{ facade.statusLabel(alert.status) }}</span>
+              </div>
+            </header>
+
+            <p class="alert-detail">{{ facade.copy(alert.detail) }}</p>
+
+            @if (alert.responseNote) {
+              <div class="response-record">
+                <strong>{{ locale.text('Recorded response', 'Respuesta registrada') }}</strong>
+                <p>{{ alert.responseNote }}</p>
+                <span class="text-muted">{{ facade.author(alert.author) }}@if (alert.acknowledgedAt) { · {{ locale.text('Acknowledged', 'Atendida') }} {{ facade.captured(alert.acknowledgedAt) }} }@if (alert.resolvedAt) { · {{ locale.text('Resolved', 'Resuelta') }} {{ facade.captured(alert.resolvedAt) }}</span>
+              </div>
+            }
+
+            @if (alert.status !== 'resolved') {
+              @if (responseAlertId() === alert.id) {
+                <form id="alert-response-form" class="response-form" [formGroup]="responseForm" (ngSubmit)="submitResponse(alert.id)">
+                  <div class="field">
+                    <label for="alert-response-note">{{ locale.text('Finding or action taken', 'Hallazgo o acción realizada') }}</label>
+                    <textarea id="alert-response-note" formControlName="note" rows="3" maxlength="500" required [attr.aria-invalid]="responseForm.controls.note.invalid && responseForm.controls.note.touched ? 'true' : null" [attr.aria-describedby]="responseForm.controls.note.invalid && responseForm.controls.note.touched ? 'alert-note-hint alert-note-error' : 'alert-note-hint'"></textarea>
+                    <span id="alert-note-hint" class="text-muted">{{ locale.text('5–500 characters. This demo stores the note locally and sends no notification.', 'De 5 a 500 caracteres. Esta demo guarda la nota localmente y no envía notificaciones.') }}</span>
+                    @if (responseForm.controls.note.invalid && responseForm.controls.note.touched) { <span id="alert-note-error" class="form-error" role="alert">{{ locale.text('Enter a note between 5 and 500 characters.', 'Escribe una nota de 5 a 500 caracteres.') }}</span> }
+                  </div>
+                  <div class="response-actions">
+                    <button class="btn primary" type="submit">{{ responseAction() === 'acknowledged' ? locale.text('Acknowledge alert', 'Atender alerta') : locale.text('Resolve alert', 'Resolver alerta') }}</button>
+                    <button class="btn secondary" type="button" (click)="cancelResponse()">{{ locale.text('Cancel', 'Cancelar') }}</button>
+                  </div>
+                </form>
+              } @else {
+                <button class="btn primary alert-action" type="button" (click)="beginResponse(alert)">{{ alert.status === 'open' ? locale.text('Record response', 'Registrar respuesta') : locale.text('Resolve alert', 'Resolver alerta') }}</button>
+              }
+            }
+          </article>
+        </li>
+      } @empty {
+        <li class="empty-state" role="status">{{ locale.text('No alerts match these filters. Clear filters or select another herd.', 'No hay alertas que coincidan. Limpia los filtros o elige otro hato.') }}</li>
+      }
+    </ol>
+  </div>
+</section>
